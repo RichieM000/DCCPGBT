@@ -107,7 +107,7 @@ $userTasks = getUserRequest($connections);
                     <form action="code.php" method="POST" id="myForm">
                         <input type="hidden" name="action" value="complete">
                         <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
-                <button type="submit" name="confirmrequest" class="text-blue-500 hover:text-blue-700" onclick="return confirm('Confirm Request?')"><i class="ri-checkbox-circle-fill"></i></button>
+                <button type="submit" name="completerequest" class="text-blue-500 hover:text-blue-700" onclick="return confirm('Confirm Request?')"><i class="ri-checkbox-circle-fill"></i></button>
                 </form>
                 <?php }?>
 

@@ -1,62 +1,51 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include"header.php"?>
+<?php
+require_once 'functions.php';
 
- 
+// Assuming you have a function to get the ID from the database
+// Example: Fetching the ID from the database
+$userTasks = getUserRequest($connections);
 
-<body class="page-body  page-left-in" data-url="http://neon.dev">
+?>
 
-<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default-->
 
-<?php include"sidebar.php"?>
 
-<title>Cleaned Purok</title>
-
-	<link rel="stylesheet" href="assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css">
-	<link rel="stylesheet" href="assets/css/font-icons/entypo/css/entypo.css">
-	<link rel="stylesheet" href="assets/css/bootstrap.css">
-	<link rel="stylesheet" href="assets/css/neon-core.css">
-	<link rel="stylesheet" href="assets/css/neon-theme.css">
-	<link rel="stylesheet" href="assets/css/neon-forms.css">
-	<link rel="stylesheet" href="assets/css/custom.css">
-
-	<script src="assets/js/jquery-1.11.3.min.js"></script>
-	
-</head>
-<body class="page-body" data-url="http://neon.dev">
+<body class="page-body  page-left-in font-sans" data-url="http://neon.dev">
 
 <div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default-->
 	
-	<div class="sidebar-menu">
+	<?php include"sidebar.php"?>
 
-		<div class="sidebar-menu-inner">
-			
-			<header class="logo-env">
-
-				<!-- logo -->
-				<div class="logo">
-					<a href="index.php">
-						
-					</a>
-				</div>
-
-				<!-- logo collapse icon -->
+	<div class="main-content">
+				
+		<div class="row">
 		
+			 
+			<div class="col-md-6 col-sm-4 clearfix hidden-xs">
+		
+				<ul class="list-inline links-list pull-right">
+	
+		
+		
+			</div>
+            <h1 class="font-bold text-2xl text-center">Resident's Request</h1>
+		
+		</div>
+		
+		<hr />
+  
 
-								
-				<!-- open/close menu icon (do not remove if you want to enable menu on mobile devices) -->
-				<div class="sidebar-mobile-menu visible-xs">
-					<a href="#" class="with-animation"><!-- add class "with-animation" to support animation -->
-						<i class="entypo-menu"></i>
-					</a>
-				</div>
-
-			</header>
-
-</div>
+		
+	
 		
 		<?php include"footer.php" ?>
 		
-
+        </div>
+        <!-- <script>
+         new DataTable('#example');
+        </script> -->
 </body>
 </html>

@@ -48,7 +48,7 @@ var baseurl = '';
 		
 		<div class="flex flex-col justify-center items-center">
 			
-			<a href="index.html" class="">
+			<a href="" class="">
 				<img src="admin/assets/images/logo.png" width="200" alt="" />
 			</a>
 			
@@ -83,7 +83,7 @@ var baseurl = '';
                    <a href="admin/index.php">
                     <div class="p-2 text-lg text-gray-400 rounded-md mb-3 hover:text-gray-300 hover:scale-105 transition duration-300 ease-in-out" style="background-color: #373e4a;"><i class="ri-admin-fill"></i> Admin Login</div>
                    </a>
-                   <a href="">
+                   <a href="guest/index.php">
                     <div class="p-2 text-lg text-gray-400 rounded-md mb-3 hover:text-gray-300 hover:scale-105 transition duration-300 ease-in-out" style="background-color: #373e4a;"><i class="ri-user-2-fill"></i> Staff Login</div>
                    </a>   
                    <a href="" data-bs-toggle="modal" data-bs-target="#staticBackdrop">

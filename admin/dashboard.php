@@ -1,7 +1,15 @@
+<?php session_start();  ?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include"header.php"?>
-
+<?php
+require_once 'functions.php';
+	$totalUsers = countStaff($connections);
+	$totalrequest = countRequest($connections);
+	$totalpurok = countPurok($connections);
+	$totaltools = countTools($connections);
+	$totalevent = countEvent($connections);
+?>
 
 
 <body class="page-body  page-left-in" data-url="http://neon.dev">
@@ -109,91 +117,123 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="well">
-					<h1>November 04, 2024</h1>
-					<h3>Welcome to the site <strong>Admin</strong></h3>
+				<h1><?php echo date('F d, Y'); ?></h1>
+					<h3>Welcome to the site <strong><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : 'User'; ?></strong></h3>
 				</div>
 			</div>
 		</div>
 		
-		<div class="row">
-		
-			<div class="col-sm-9">
-		
-				<div class="row">
-		
-					<div class="col-sm-6">
-		
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<div class="panel-title">New vs Returning Visitors</div>
-		
-								
-							</div>
-							<div class="panel-body">
-								<center><span class="chart"></span></center>
-							</div>
-						</div>
-		
-					</div>
-		
-					<div class="col-sm-6">
-		
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<div class="panel-title">Latest Users</div>
-		
-								
-							<table class="table table-bordered table-responsive">
-								<thead>
-									<tr>
-										<th>#</th>
-										<th>Name</th>
-										<th>Position</th>
-										<th>Activity</th>
-									</tr>
-								</thead>
-		
-								<tbody>
-									<tr>
-										<td>1</td>
-										<td>Art Ramadani</td>
-										<td>CEO</td>
-										<td class="text-center"><span class="pie">4,3,5</span></td>
-									</tr>
-		
-									<tr>
-										<td>2</td>
-										<td>Filan Fisteku</td>
-										<td>Member</td>
-										<td class="text-center"><span class="pie">1,3,4</span></td>
-									</tr>
-		
-									<tr>
-										<td>3</td>
-										<td>Arlind Nushi</td>
-										<td>Co-founder</td>
-										<td class="text-center"><span class="pie">5,3,2</span></td>
-									</tr>
-		
-								</tbody>
-							</table>
-						</div>
-		
-					</div>
-		
-				</div>
-		
-		
-					</div>
-		
-					<div class="panel-body no-padding">
-						<div id="rickshaw-chart-demo-2">
-							<div id="rickshaw-legend"></div>
-						</div>
-					</div>
+		<!-- <div class="bg-blue-500 text-white p-4 rounded-md">
+  <div class="flex justify-between items-center">
+    <div class="text-4xl font-bold">150</div>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+      <path d="M3 1a1 1 0 000 2h14a1 1 0 000-2H3zM3 5a1 1 0 000 2h14a1 1 0 000-2H3zM3 9a1 1 0 000 2h14a1 1 0 000-2H3z" />
+    </svg>
+  </div>
+  <div class="text-sm mt-2">New Orders</div>
+  <a href="#" class="text-white font-bold hover:underline mt-2">More info →</a>
+</div> -->
 
-				</div>
-			</div>
+<div class="grid grid-cols-4">
+
+	<div class="bg-blue-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+
+		<div class="flex justify-between items-center">
+
+		<div class="flex flex-col">
+			<h2 class="text-4xl font-bold"><?php echo $totalUsers ?></h2>
+			<h1 class="mt-1.5 text-base">Users Registered</h1>
+		</div>
+
+		<span class="text-6xl opacity-25 text-black"><i class="ri-user-fill"></i></span>
+
+		</div>
+
+		<div class="flex items-end justify-center mt-3">
+        <a href="staff.php" class="text-white font-bold hover:underline">More info →</a>
+        </div>
+		
+		</div>
+
+<div class="bg-orange-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+
+		<div class="flex justify-between items-center">
+
+		<div class="flex flex-col">
+			<h2 class="text-4xl font-bold"><?php echo $totalrequest ?></h2>
+			<h1 class="mt-1.5 text-base">Residents Request</h1>
+		</div>
+
+		<span class="text-6xl opacity-25 text-black"><i class="ri-todo-fill"></i></span>
+
+		</div>
+
+		<div class="flex items-end justify-center mt-3">
+		<a href="request.php" class="text-white font-bold hover:underline">More info →</a>
+		</div>
+
+</div>
+
+<div class="bg-green-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+
+		<div class="flex justify-between items-center">
+
+		<div class="flex flex-col">
+			<h2 class="text-4xl font-bold"><?php echo $totalpurok ?></h2>
+			<h1 class="mt-1.5 text-base">Total Puroks</h1>
+		</div>
+
+		<span class="text-6xl opacity-25 text-black"><i class="ri-home-7-fill"></i></span>
+
+		</div>
+
+		<div class="flex items-end justify-center mt-3">
+		<a href="purok.php" class="text-white font-bold hover:underline">More info →</a>
+		</div>
+
+</div>
+
+<div class="bg-cyan-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+
+		<div class="flex justify-between items-center">
+
+		<div class="flex flex-col">
+			<h2 class="text-4xl font-bold"><?php echo $totaltools ?></h2>
+			<h1 class="mt-1.5 text-base">Total Tools</h1>
+		</div>
+
+		<span class="text-6xl opacity-25 text-black"><i class="ri-tools-fill"></i></span>
+
+		</div>
+
+		<div class="flex items-end justify-center mt-3">
+		<a href="tools.php" class="text-white font-bold hover:underline">More info →</a>
+		</div>
+
+</div>
+
+<div class="bg-yellow-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+
+		<div class="flex justify-between items-center">
+
+		<div class="flex flex-col">
+			<h2 class="text-4xl font-bold"><?php echo $totalevent ?></h2>
+			<h1 class="mt-1.5 text-base">Total Events</h1>
+		</div>
+
+		<span class="text-6xl opacity-25 text-black"><i class="ri-file-list-3-fill"></i></span>
+
+		</div>
+
+		<div class="flex items-end justify-center mt-3">
+		<a href="activities.php" class="text-white font-bold hover:underline">More info →</a>
+		</div>
+
+</div>
+
+
+		</div>
+		
 		
 		<?php include"footer.php" ?>
 		

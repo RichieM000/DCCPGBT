@@ -30,6 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $id = $row["id"];
                 $db_password = $row["password"];
                 $account_type = $row["usertype"];
+				$first_name = $row["fname"]; 
 
 				$hashed_password = password_hash($password, PASSWORD_DEFAULT);
                 
@@ -38,12 +39,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     session_start();
 
                     $_SESSION["id"] = $id;
+					$_SESSION["name"] = $first_name;
                     
                     if ($account_type == "admin") {
                         echo "<script>window.location.href='dashboard.php';</script>";
                        
                     } else if($account_type == "user") {
-						echo "<script>window.location.href='../guest/home.php';</script>";
+						// echo "<script>window.location.href='../guest/home.php';</script>";
+						$useralert = "This Account is belong to the staff, please go to the staff login";
 					}else{
 						echo 'There is an error';
 					}
@@ -111,6 +114,7 @@ var baseurl = '';
 			</a>
 			
 			<p class="description">Digitizing Community Cleanup for a Greener Barangay Taloc</p>
+			<h1 style="color: gray;">Admin Login</h1>
 			
 			<!-- progress bar indicator -->
 			<div class="login-progressbar-indicator">
@@ -136,7 +140,7 @@ var baseurl = '';
 			<form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" role="form">
 				
 				<div class="form-group">
-					
+				<?php if(isset($useralert)) { echo "<span style='color:red'>".$useralert."</span>"; }?>
 					<div class="input-group">
 						<div class="input-group-addon">
 							<i class="entypo-user"></i>

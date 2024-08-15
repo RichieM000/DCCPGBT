@@ -1,4 +1,6 @@
-
+<?php 
+session_start();
+?>
 
 <div class="sidebar-menu font-sans"> 
 
@@ -32,7 +34,7 @@
 						<img src="assets/images/thumb-1@2x.png" width="55" alt="" class="img-circle" />
 
 						<span>Welcome,</span>
-						<strong>Admin</strong>
+						<strong><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : 'User'; ?></strong>
 					</a>
 				</div>
 
@@ -84,6 +86,12 @@
 								<span class="title">Calendar</span>
 							</a>
 						</li>
+
+						<li>
+							<a href="activities.php">
+								<span class="title">List of Activities</span>
+							</a>
+						</li>
 						
 					</ul>
 				</li>
@@ -91,25 +99,7 @@
 			
 
 
-				<li class="has-sub">
-					<a href="scheduling.php">
-						<i class="entypo-users"></i>
-						<span class="title">Barangay Staff's</span>
-					</a>
-					<ul>
-						<li>
-							<a href="staff.php">
-								<span class="title">List</span>
-							</a>
-						</li>
-						<li>
-							<a href="addstaff.php">
-								<span class="title">Add New</span>
-							</a>
-						</li>
-						
-					</ul>
-				</li>
+			
 
 
 
@@ -158,20 +148,7 @@
 						
 					</ul>
 				</li>
-				<li class="has-sub">
-					<a href="resource_management.php">
-						<i class="entypo-bag"></i>
-						<span class="title">Resource Management</span>
-						
-					</a>
-					<ul>
-						<li class="has-sub">
-							<a href="tools.php">
-								<span class="title">Cleaning Tools</span>
-								
-							</a>
-							</ul>
-				</li>
+				
 				
 				<li class="has-sub">
 					<a href="monitoring_report.php">
@@ -185,6 +162,7 @@
 								<span class="title">Documentation/Report</span>
 							</a>
 							</ul>
+					</li>
 						</li>
 
 					

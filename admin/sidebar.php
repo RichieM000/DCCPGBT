@@ -1,5 +1,4 @@
 
-
 <div class="sidebar-menu font-sans"> 
 
 		<div class="sidebar-menu-inner font-sans">
@@ -32,7 +31,7 @@
 						<img src="assets/images/thumb-1@2x.png" width="55" alt="" class="img-circle" />
 
 						<span>Welcome,</span>
-						<strong>User</strong>
+						<strong><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : 'User'; ?></strong>
 					</a>
 				</div>
 
@@ -191,6 +190,15 @@
 								<span class="title">Documentation/Report</span>
 							</a>
 							</ul>
+					</li>
+						</li>
+
+						<li class="opened">
+					<a href="logout.php">
+					<i class="entypo-logout"></i>
+						<span class="title">Logout</span>
+					</a>
+					
 						</li>
 
 					
@@ -203,11 +211,8 @@
 			
 		</div>
 		
-<li class="hover:bg-gray-700 list-none py-2 pl-2">
-    <a href="logout.php" class="ml-4 pointer" style="color: white;">
-        <i class="entypo-logout"></i>
-        <span class="">Log Out</span>
-    </a>
-</li>
+
+
+
 	</div>
 

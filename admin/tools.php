@@ -35,6 +35,8 @@ $tools = getTools($connections);
 		</div>
 		
 		<hr />
+
+    
     <div>
 	<div class="flex justify-end m-4">
 	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
@@ -63,8 +65,8 @@ $tools = getTools($connections);
           <td><?php echo $tool['tool_data']['quantity']; ?></td>
               
     <td class="text-2xl">
-                <a href="#" class="text-blue-500 edit_data"><i class="ri-edit-fill"></i></a>
-                <a href="code.php?idtool=<?php echo $tool['tool_data']['id'];?>" class="text-red-500 hover:text-red-700 delete_data" onclick="return confirm('Are you sure you want to delete this data?')"><i class="ri-delete-bin-fill"></i></a>
+                <a href="#" class="text-blue-500 edit_tool"><i class="ri-edit-fill"></i></a>
+                <a href="code.php?idtool=<?php echo $tool['tool_data']['id'];?>" class="text-red-500 hover:text-red-700" onclick="return confirm('Are you sure you want to delete this data?')"><i class="ri-delete-bin-fill"></i></a>
                 </td>
 
 
@@ -93,16 +95,16 @@ $tools = getTools($connections);
       
 	  <div class="">
     <label for="" class="text-xl">Tool Image:</label>
-    <input type="file" name="img" id="img" accept="image/*" onchange="loadFile(event)">
+    <input type="file" name="img" id="img" accept="image/*" onchange="loadAddFile(event)">
     <div class="m-auto overflow-hidden rounded-full bg-gray-200 w-32 h-32">
        <span id="old_img_span"> <img src="<?php echo isset($avatar)? 'assets/uploads/'.$avatar :'assets/uploads/no_image.jpg'?>" id="cimg" class="w-full h-full bg-contain rounded-full"></span>
       
        
     </div>
-   
+    
     
     <script>
-function loadFile(event) {
+function loadAddFile(event) {
     var image = document.getElementById('cimg');
     image.src = URL.createObjectURL(event.target.files[0]);
     image.onload = function() {
@@ -147,21 +149,23 @@ function loadFile(event) {
       </div>
       <div class="modal-body">
 
-      <form action="code.php" method="POST" enctype="multipart/form-data">
+      <form action="code.php" id="edit-form" method="POST" enctype="multipart/form-data">
 
       <input type="hidden" name="id" id="tool_id">
+
 	  <div class="">
+    
     <label for="" class="text-xl">Tool Image:</label>
     <input type="file" name="img" id="img" accept="image/*" onchange="loadFile(event)">
     <div class="m-auto overflow-hidden rounded-full bg-gray-200 w-32 h-32">
-       <span id="old_img_span"> <img src="<?php echo isset($avatar)? 'assets/uploads/'.$avatar :'assets/uploads/no_image.jpg'?>" id="cimg" class="w-full h-full bg-contain rounded-full"></span>
+       <span id="old_img_span"> <img src="<?php echo isset($avatar)? 'assets/uploads/'.$avatar :'assets/uploads/no_image.jpg'?>" id="editimg" class="w-full h-full bg-contain rounded-full"></span>
       
     </div>
-    <input type="hidden" name="old_img" id="old_img" value="<?php echo isset($avatar)? $avatar :''?>" readonly>
+    <input type="hidden" name="old_img" id="old_img" value="<?php echo isset($avatar)? $avatar :''?>">
     
     <script>
 function loadFile(event) {
-    var image = document.getElementById('cimg');
+    var image = document.getElementById('editimg');
     image.src = URL.createObjectURL(event.target.files[0]);
     image.onload = function() {
         URL.revokeObjectURL(image.src); // free memory
@@ -193,7 +197,7 @@ function loadFile(event) {
 
 <script>
   $(document).ready(function (){
-        $('.edit_data').click(function (e) {
+        $('.edit_tool').click(function (e) {
             e.preventDefault();
 
             var tool_id = $(this).closest('tr').find('.tool_id').text();
@@ -210,7 +214,7 @@ function loadFile(event) {
 
                     $.each(response, function(Key, value){
                         $('#tool_id').val(value['id']);
-                        $('#img').attr('src', 'assets/uploads/' + value['image']);
+                          
                         $('#old_img_span img').attr('src', 'assets/uploads/' + value['image']); 
                         $('#oldimg').val(value['image']);
                         $('#toolname1').val(value['name']);
