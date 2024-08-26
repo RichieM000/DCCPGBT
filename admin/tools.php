@@ -43,6 +43,7 @@ $tools = getTools($connections);
   Add Tools
 </button>
         </div>
+
 <div class="data_table">
     <table id="example" class="table hover table-striped font-semibold text-lg" style="width:100%">
         <thead>
@@ -59,6 +60,7 @@ $tools = getTools($connections);
         <tbody>
           <?php foreach($tools as $tool){ ?>
           <tr>
+            
           <td class="tool_id" style="display: none;"><?php echo $tool['tool_data']['id'];?></td>
           <td><img src="<?php echo $tool['image_src']; ?>" alt="Profile Image" width="50" height="50" class="rounded-full"></td>
           <td class="capitalize"><?php echo $tool['tool_data']['name']; ?></td>

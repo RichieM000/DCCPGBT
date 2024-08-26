@@ -40,12 +40,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     $_SESSION["id"] = $id;
 					$_SESSION["name"] = $first_name;
+					$staffid = $_SESSION['id'];
                     
                     if ($account_type == "user") {
                         echo "<script>window.location.href='dashboard.php';</script>";
                        
                     } else if($account_type == "admin") {
-						$useralert = "This Account is belong to the admin, please go to the admin login";
+						$useralert = "This Account is belong to the admin, please go to the <a href='../admin/index.php' style='text-decoration:underline;'>admin login</a>";
 						
 					}else{
 						echo 'There is an error';

@@ -81,11 +81,11 @@ session_start();
 						<span class="title">Schedule of Activities</span>
 					</a>
 					<ul>
-						<li>
+						<!-- <li>
 							<a href="calendar.php">
 								<span class="title">Calendar</span>
 							</a>
-						</li>
+						</li> -->
 
 						<li>
 							<a href="activities.php">
@@ -165,6 +165,14 @@ session_start();
 					</li>
 						</li>
 
+						<li class="opened">
+					<a href="logout.php">
+					<i class="entypo-logout"></i>
+						<span class="title">Logout</span>
+					</a>
+					
+						</li>
+
 					
 
 
@@ -175,11 +183,6 @@ session_start();
 			
 		</div>
 		
-<li class="hover:bg-gray-700 list-none py-2 pl-2">
-    <a href="logout.php" class="ml-4 pointer" style="color: white;">
-        <i class="entypo-logout"></i>
-        <span class="">Log Out</span>
-    </a>
-</li>
+
 	</div>
 

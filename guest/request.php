@@ -50,7 +50,7 @@ $userTasks = getUserRequest($connections);
                 <th class="font-bold">Reason</th>
                 <th class="font-bold">Comments</th>
                 <th class="font-bold">Status</th>
-                <th class="font-bold">Actions</th>
+                <!-- <th class="font-bold">Actions</th> -->
                
             </tr>
         </thead>
@@ -68,13 +68,13 @@ $userTasks = getUserRequest($connections);
                 <td class="whitespace-nowrap capitalize" style="color: <?php 
     switch ($task['status']) {
         case 'pending':
-            echo 'gray';
+            echo 'green';
             break;
         case 'in progress':
             echo 'blue';
             break;
-        case 'complete':
-            echo 'green';
+        case 'done':
+            echo 'gray';
             break;
         default:
             echo 'red';
@@ -89,7 +89,7 @@ $userTasks = getUserRequest($connections);
         
 
 
-                <td class="py-4 px-6 text-2xl whitespace-nowrap flex justify-center gap-2">
+                <!-- <td class="py-4 px-6 text-2xl whitespace-nowrap flex justify-center gap-2">
 
                 <?php  if($task['status'] == 'pending'){ ?>
 
@@ -107,12 +107,12 @@ $userTasks = getUserRequest($connections);
                     <form action="code.php" method="POST" id="myForm">
                         <input type="hidden" name="action" value="complete">
                         <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
-                <button type="submit" name="completerequest" class="text-blue-500 hover:text-blue-700" onclick="return confirm('Complete Request?')"><i class="ri-checkbox-circle-fill"></i></button>
+                <button type="submit" name="completerequest" class="text-blue-500 hover:text-blue-700" onclick="return confirm('Confirm Request?')"><i class="ri-checkbox-circle-fill"></i></button>
                 </form>
                 <?php }?>
 
                <a href="code.php?id=<?php echo $task['id'];?>" class="text-red-500 hover:text-red-700 delete_data" onclick="return confirm('Are you sure you want to delete this data?')"><i class="ri-delete-bin-fill"></i></a>
-                </td>
+                </td> -->
                
             </tr>
           <?php }?>

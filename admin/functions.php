@@ -54,6 +54,18 @@ function countPurok($connections){
 
 
 
+function countAlbum($connections){
+  $sql = "SELECT COUNT(*) AS total_album FROM tbl_album";
+  $result = mysqli_query($connections, $sql);
+
+  $row = mysqli_fetch_assoc($result);
+  $totalAlbum = $row['total_album'];
+
+  return $totalAlbum;
+}
+
+
+
 function getAlbum($connections){
   $query = "SELECT * FROM tbl_album";
   $result = mysqli_query($connections, $query);
@@ -156,8 +168,64 @@ function getImages($connections, $albumId) {
 
   return $images;
 }
+function getAlbumImageCount($albumId, $connections) {
+  $sql = "SELECT COUNT(*) as image_count FROM tbl_images WHERE album_id = ?";
+  $stmt = $connections->prepare($sql);
+  $stmt->bind_param("i", $albumId);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  $stmt->close();
+  return $row['image_count'];
+}
 
 
+
+function completeEvent($connections){
+  $sql = "SELECT * FROM tbl_eventsched WHERE status = 'complete'";
+  
+  $stmt = $connections->prepare($sql);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  $completes = array();
+  while($row = $result->fetch_assoc()){
+    $completes[] = $row;
+  }
+
+  $stmt->close();
+
+  return $completes;
+}
+
+function cleanedPurok($connections){
+  $sql = "SELECT * FROM tbl_waste";
+  
+  $stmt = $connections->prepare($sql);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  $cleaned = array();
+  while($row = $result->fetch_assoc()){
+    $cleaned[] = $row;
+  }
+
+  $stmt->close();
+
+  return $cleaned;
+}
+function countCleaned($connections){
+    // Query to get the count of registered users
+    $sql = "SELECT COUNT(*) AS total_cleaned FROM tbl_waste";
+    $result = mysqli_query($connections, $sql);
+  
+    // Fetch the count
+    $row = mysqli_fetch_assoc($result);
+    $totalcleaned = $row['total_cleaned'];
+  
+    // Close the database connection
+    return $totalcleaned;
+}
 
 
 

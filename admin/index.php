@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                        
                     } else if($account_type == "user") {
 						// echo "<script>window.location.href='../guest/home.php';</script>";
-						$useralert = "This Account is belong to the staff, please go to the staff login";
+						$useralert = "This Account is belong to the staff, please go to the <a href='../guest/index.php' style='text-decoration:underline;'>staff login</a>";
 					}else{
 						echo 'There is an error';
 					}

@@ -52,6 +52,17 @@ function countPurok($connections){
   return $totalpurok;
 }
 
+function countAlbum($connections){
+  $sql = "SELECT COUNT(*) AS total_album FROM tbl_album";
+  $result = mysqli_query($connections, $sql);
+
+  $row = mysqli_fetch_assoc($result);
+  $totalAlbum = $row['total_album'];
+
+  return $totalAlbum;
+}
+
+
 
 
 function getAlbum($connections){
@@ -156,6 +167,53 @@ function getImages($connections, $albumId) {
 
   return $images;
 }
+function getAlbumImageCount($albumId, $connections) {
+  $sql = "SELECT COUNT(*) as image_count FROM tbl_images WHERE album_id = ?";
+  $stmt = $connections->prepare($sql);
+  $stmt->bind_param("i", $albumId);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  $stmt->close();
+  return $row['image_count'];
+}
+
+function cleanedPurok($connections){
+  $sql = "SELECT * FROM tbl_waste";
+  
+  $stmt = $connections->prepare($sql);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  $cleaned = array();
+  while($row = $result->fetch_assoc()){
+    $cleaned[] = $row;
+  }
+
+  $stmt->close();
+
+  return $cleaned;
+}
+function countCleaned($connections){
+    // Query to get the count of registered users
+    $sql = "SELECT COUNT(*) AS total_cleaned FROM tbl_waste";
+    $result = mysqli_query($connections, $sql);
+  
+    // Fetch the count
+    $row = mysqli_fetch_assoc($result);
+    $totalcleaned = $row['total_cleaned'];
+  
+    // Close the database connection
+    return $totalcleaned;
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -197,6 +255,67 @@ function countEvent($connections){
   // Close the database connection
   return $totalevent;
 }
+
+function getEventsByStaffId($connections, $staffId) {
+  $query = "SELECT e.id, e.title, e.location, e.start_date, e.end_date, e.status, 
+  GROUP_CONCAT(DISTINCT CONCAT(t.name, ' (', et.quantity, ')') ORDER BY t.name SEPARATOR ', ') AS tools,
+  GROUP_CONCAT(DISTINCT CONCAT(s.fname, ' ', s.lname) ORDER BY s.fname SEPARATOR ', ') AS staff
+FROM tbl_eventsched e
+LEFT JOIN tbl_event_tools et ON e.id = et.event_id
+LEFT JOIN tbl_tools t ON et.tool_id = t.id
+LEFT JOIN tbl_event_staff es ON e.id = es.event_id
+LEFT JOIN tbl_staff s ON es.staff_id = s.id
+WHERE es.staff_id = ?
+GROUP BY e.id, e.title, e.location, e.start_date, e.end_date";
+
+  // Prepare and execute the query
+  if ($stmt = $connections->prepare($query)) {
+      $stmt->bind_param("i", $staffId);  // Bind the staff ID as an integer parameter
+      $stmt->execute();
+      $result = $stmt->get_result();
+      
+      // Fetch all events and store them in an array
+      $staffevents = [];
+      while ($row = $result->fetch_assoc()) {
+          $staffevents[] = $row;
+      }
+      
+      // Close the statement
+      $stmt->close();
+
+      return $staffevents;  // Return the array of events
+  } else {
+      echo "Error: " . $connections->error;
+      exit;
+  }
+}
+
+function countStaffEvent($connections,  $staffId){
+  $query = "SELECT COUNT(e.id) AS event_count
+FROM tbl_eventsched e
+LEFT JOIN tbl_event_staff es ON e.id = es.event_id
+WHERE es.staff_id = ?";
+
+  // Prepare and execute the query
+  if ($stmt = $connections->prepare($query)) {
+      $stmt->bind_param("i", $staffId);  // Bind the staff ID as an integer parameter
+      $stmt->execute();
+      $result = $stmt->get_result();
+      
+      // Fetch the event count
+      $row = $result->fetch_assoc();
+      $eventCount = $row['event_count'];
+      
+      // Close the statement
+      $stmt->close();
+
+      return $eventCount;  // Return the event count
+  } else {
+      echo "Error: " . $connections->error;
+      exit;
+  }
+}
+
 
 
 

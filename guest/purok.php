@@ -50,7 +50,6 @@ $puroklist = getPurok($connections);
   Add Purok
 </button>
         </div>
-        
 <div class="data_table">
     <table id="example" class="table hover table-striped font-semibold text-lg" style="width:100%">
         <thead>

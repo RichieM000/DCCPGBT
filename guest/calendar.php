@@ -1,4 +1,4 @@
-<?php session_start() ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,7 +10,6 @@
     $staffList = getUsers($connections);
     $events = getEvent($connections);
     $tools = getTools($connections); // assuming $connections is your database connection
-    $userTasks = getUserRequest($connections);
 $availableTags = array_column(array_map(function($tool) {
     return $tool['tool_data'];
 }, $tools), 'name');
@@ -312,8 +311,8 @@ window.onload = function() {
 
     const selectedTool = select.options[select.selectedIndex].text;
     const selectedToolId = select.value;
-    const quantity = parseInt(quantityInput.value); // Convert quantity to an integer
-    const maxQuantity = parseInt(select.options[select.selectedIndex].getAttribute('data-quantity')); // Convert maxQuantity to an integer
+    const quantity = quantityInput.value;
+    const maxQuantity = select.options[select.selectedIndex].getAttribute('data-quantity');
 
     if (selectedToolId && quantity) {
         if (quantity > maxQuantity) {

@@ -58,9 +58,9 @@ if (isset($_POST['submitevent'])) {
     $staff_ids = $_POST['astaff'];
     $start_date = trim($_POST['start_date']);
     $end_date = trim($_POST['end_date']);
-    $request_id = isset($_POST['requestid']);
+    $request_id = isset($_SESSION['request_id']) ? $_SESSION['request_id'] : null;
     
-    $request_id = "";
+    
     $event_id = null; // Initialize event_id
 
     // Start a transaction
@@ -68,11 +68,12 @@ if (isset($_POST['submitevent'])) {
 
     try {
         // Insert event data
+      
         $sql = "INSERT INTO tbl_eventsched (request_id, title, location, tools, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)";
         $default_tools = '';
         $stmt = $connections->prepare($sql);
         $stmt->bind_param("isssss", $request_id, $title, $location, $default_tools, $start_date, $end_date);
-
+       
         if (!$stmt->execute()) {
             throw new Exception("Error inserting event: " . $stmt->error);
         }
@@ -132,7 +133,7 @@ if (isset($_POST['submitevent'])) {
        } else {
             throw new Exception("Please select staff members.");
         }
-
+        unset($_SESSION['request_id']);
         // Commit the transaction
         $connections->commit();
 
@@ -775,18 +776,21 @@ if(isset($_POST['confirmrequest'])){
 }
 
 // complete request
-if(isset($_POST['completerequest'])) {
+if (isset($_POST['completerequest'])) {
     $action = $_POST['action'];
     $id = $_POST['id'];
+
+    date_default_timezone_set('Asia/Manila');
+    $currentDate = date('Y-m-d H:i:s');
 
     // Start a transaction
     mysqli_begin_transaction($connections);
 
-    // Update the status column in the tbl_request table
-    $sql1 = "UPDATE tbl_request SET status = '$action' WHERE id = '$id'";
+    // Update the status and date columns in the tbl_request table
+    $sql1 = "UPDATE tbl_request SET status = '$action', date = '$currentDate' WHERE id = '$id'";
 
-    // Update the status column in the tbl_eventsched table
-    $sql2 = "UPDATE tbl_eventsched SET status = '$action' WHERE request_id = '$id'"; // Assuming the foreign key in tbl_eventsched is request_id
+    // Update the status and date columns in the tbl_eventsched table
+    $sql2 = "UPDATE tbl_eventsched SET status = '$action', date = '$currentDate' WHERE request_id = '$id'"; // Assuming the foreign key in tbl_eventsched is request_id
 
     if (mysqli_query($connections, $sql1) && mysqli_query($connections, $sql2)) {
         // Commit the transaction
@@ -800,6 +804,7 @@ if(isset($_POST['completerequest'])) {
         echo "Error updating status: " . mysqli_error($connections);
     }
 }
+
 
 
 
@@ -1671,7 +1676,6 @@ if(isset($_POST['updatevolunteer'])){
 if(isset($_GET['idlist'])){
     $id = $_GET['idlist'];
 
-
     // Delete the record from the database
     $stmt = $connections->prepare("DELETE FROM tbl_volunteers WHERE id =?");
     $stmt->bind_param("i", $id);
@@ -1693,6 +1697,178 @@ if(isset($_GET['idlist'])){
     $stmt->close();
 }
 
+// cleaned purok edit/add
+if(isset($_POST['complete_edit_btn'])){
+    $id = $_POST['complete_id'];
+    $arrayresult = [];
+
+    $fetch_query = "SELECT * FROM tbl_eventsched WHERE id='$id'";
+    $fetch_query_run = mysqli_query($connections, $fetch_query);
+ 
+    if(mysqli_num_rows($fetch_query_run) > 0){
+ 
+     while ($row = mysqli_fetch_array($fetch_query_run)){
+         
+ 
+       array_push($arrayresult, $row);
+       header('content-type: application/json');
+       echo json_encode($arrayresult);
+     }
+ 
+    }else{
+       echo '<h4>No record found!</h4>';
+    }
+}
+// add cleaned purok
+if(isset($_POST['submitclean'])){
+    $purok = $_POST['purok'];
+    $date = $_POST['date'];
+    $paper = $_POST['paper'];
+    $glass = $_POST['glass'];
+    $organic = $_POST['organic'];
+    $plastic = $_POST['plastic'];
+    $action = $_POST['action'];
+    $id = $_POST['id'];
+    $totalwaste = $paper + $glass + $organic + $plastic;
+
+    $sql2 = "UPDATE tbl_eventsched SET status = '$action' WHERE request_id = '$id'";
+    $sql3 = "UPDATE tbl_request SET status = '$action' WHERE id = '$id'";  
+
+    $sql = "INSERT INTO tbl_waste (purok, date, paper, glass, organic, plastic, totalwaste) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $connections->prepare($sql);
+    if (!$stmt) {
+        echo "Prepare failed: (" . $connections->errno . ") " . $connections->error;
+        exit;
+    }
+  
+    $stmt->bind_param("sssssss", $purok, $date, $paper, $glass, $organic, $plastic, $totalwaste);
+    try {
+        $stmt->execute();
+        if ($stmt->affected_rows > 0) {
+            $stmt2 = $connections->prepare($sql2);
+            if (!$stmt2) {
+                echo "Prepare failed: (" . $connections->errno . ") " . $connections->error;
+                exit;
+            }
+            $stmt2->execute();
+            if ($stmt2->affected_rows > 0) {
+                $stmt3 = $connections->prepare($sql3);
+                if (!$stmt3) {
+                    echo "Prepare failed: (" . $connections->errno . ") " . $connections->error;
+                    exit;
+                }
+                $stmt3->execute();
+                if ($stmt3->affected_rows > 0) {
+                    $_SESSION['status'] = "Added successfully!";
+                    $_SESSION['status_code'] = "success";
+                    header('Location: cleaned.php');
+                } else {
+                    $_SESSION['status'] = "Delete Failed";
+                    $_SESSION['status_code'] = "error";
+                    header('Location: cleaned.php');
+                }
+                $stmt3->close();
+            } else {
+                $_SESSION['status'] = "Delete Failed";
+                $_SESSION['status_code'] = "error";
+                header('Location: cleaned.php');
+            }
+            $stmt2->close();
+        } else {
+            $_SESSION['status'] = "Delete Failed";
+            $_SESSION['status_code'] = "error";
+            header('Location: cleaned.php');
+        }
+    } catch (Exception $e) {
+        echo 'Error deleting staff data: '. $e->getMessage();
+    }
+
+    $stmt->close();
+}
+
+
+// cleaned purok edit
+if(isset($_POST['clean_edit_btn'])){
+    $id = $_POST['clean_id'];
+    $arrayresult = [];
+
+    $fetch_query = "SELECT * FROM tbl_waste WHERE id='$id'";
+    $fetch_query_run = mysqli_query($connections, $fetch_query);
+ 
+    if(mysqli_num_rows($fetch_query_run) > 0){
+ 
+     while ($row = mysqli_fetch_array($fetch_query_run)){
+         
+ 
+       array_push($arrayresult, $row);
+       header('content-type: application/json');
+       echo json_encode($arrayresult);
+     }
+ 
+    }else{
+       echo '<h4>No record found!</h4>';
+    }
+}
+
+// update cleaned purok
+if(isset($_POST['updateclean'])){
+
+    $id = $_POST['id'];
+    $purok = $_POST['purok'];
+    $date = $_POST['date'];
+    $paper = $_POST['paper'];
+    $glass = $_POST['glass'];
+    $organic = $_POST['organic'];
+    $plastic = $_POST['plastic'];
+    $totalwaste = $paper + $glass + $organic + $plastic;
+
+
+    $stmt = $connections->prepare("UPDATE tbl_waste SET purok=?, date=?, paper=?, glass=?, organic=?, plastic=?, totalwaste=? WHERE id=?");
+    $stmt->bind_param('sssssssi', $purok, $date, $paper, $glass, $organic, $plastic, $totalwaste, $id);
+
+    try {
+        $stmt->execute();
+        if ($stmt->affected_rows > 0) {
+            $_SESSION['status'] = "Deleted successfully!";
+            $_SESSION['status_code'] = "success";
+            header("Location: cleaned.php");
+        } else {
+            $_SESSION['status'] = "Delete Failed";
+            $_SESSION['status_code'] = "error";
+            header("Location: cleaned.php");
+        }
+    } catch (Exception $e) {
+        echo 'Error deleting staff data: '. $e->getMessage();
+    }
+
+    $stmt->close();
+
+}
+
+// delete volunteer
+if(isset($_GET['idclean'])){
+    $id = $_GET['idclean'];
+
+    // Delete the record from the database
+    $stmt = $connections->prepare("DELETE FROM tbl_waste WHERE id =?");
+    $stmt->bind_param("i", $id);
+    try {
+        $stmt->execute();
+        if ($stmt->affected_rows > 0) {
+            $_SESSION['status'] = "Deleted successfully!";
+            $_SESSION['status_code'] = "success";
+            header('Location: cleaned.php');
+        } else {
+            $_SESSION['status'] = "Delete Failed";
+            $_SESSION['status_code'] = "error";
+            header('Location: cleaned.php');
+        }
+    } catch (Exception $e) {
+        echo 'Error deleting staff data: '. $e->getMessage();
+    }
+
+    $stmt->close();
+}
 
 
 $connections->close();

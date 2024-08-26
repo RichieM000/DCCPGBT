@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="mb-3">
                         <label for="phone" class="block font-bold">Contact #</label>
-                        <input type="text" name="phone" id="phone" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <input type="text" name="phone" id="phone" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" maxlength="11" required>
                     </div>
 					<div class="mb-3">
                         <label for="email" class="block font-bold">Email</label>

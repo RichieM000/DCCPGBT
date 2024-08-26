@@ -3,14 +3,63 @@
 <html lang="en">
 <?php include"header.php"?>
 <?php
+include("connections.php");
 require_once 'functions.php';
 	$totalUsers = countStaff($connections);
 	$totalrequest = countRequest($connections);
 	$totalpurok = countPurok($connections);
 	$totaltools = countTools($connections);
 	$totalevent = countEvent($connections);
+	$totalcleaned = countCleaned($connections);
+	$totalAlbum = countAlbum($connections);
+
+
+	
 ?>
 
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['bar']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Purok/Year', 'Paper', 'Glass', 'Organic','Plastic'],
+      
+     <?php 
+     	$query = "SELECT purok, date, paper, glass, organic, plastic FROM tbl_waste";
+     	$stmt = mysqli_prepare($connections, $query);
+     	mysqli_stmt_execute($stmt);
+     	$result = mysqli_stmt_get_result($stmt);
+		while($data = mysqli_fetch_array($result)){
+			
+			$date = $data['date'];
+			$year = date('Y-m-d', strtotime($date));
+			$purok = $data['purok'];
+			$paper = $data['paper'];
+			$glass = $data['glass'];
+			$organic = $data['organic'];
+			$plastic = $data['plastic'];
+     ?> 
+     ['<?php echo $purok; ?> - <?php echo $year ?>', <?php echo $paper; ?>, <?php echo $glass; ?>, <?php echo $organic; ?>, <?php echo $plastic; ?>],
+
+     <?php } ?>
+    ]);
+
+    var options = {
+      chart: {
+        title: 'Waste Collected',
+        subtitle: 'Waste Segregation Chart',
+      },
+      bars: 'horizontal' // Required for Material Bar Charts.
+    };
+
+    var chart = new google.charts.Bar(document.getElementById('barchart_material'));
+
+    chart.draw(data, google.charts.Bar.convertOptions(options));
+  }
+</script>
 
 <body class="page-body  page-left-in" data-url="http://neon.dev">
 
@@ -134,6 +183,19 @@ require_once 'functions.php';
   <a href="#" class="text-white font-bold hover:underline mt-2">More info →</a>
 </div> -->
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="grid grid-cols-4">
 
 	<div class="bg-blue-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
@@ -199,7 +261,7 @@ require_once 'functions.php';
 
 		<div class="flex flex-col">
 			<h2 class="text-4xl font-bold"><?php echo $totaltools ?></h2>
-			<h1 class="mt-1.5 text-base">Total Tools</h1>
+			<h1 class="mt-1.5 text-base">Cleanup Tools</h1>
 		</div>
 
 		<span class="text-6xl opacity-25 text-black"><i class="ri-tools-fill"></i></span>
@@ -231,8 +293,49 @@ require_once 'functions.php';
 
 </div>
 
+<div class="bg-emerald-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+
+		<div class="flex justify-between items-center">
+
+		<div class="flex flex-col">
+			<h2 class="text-4xl font-bold"><?php echo $totalcleaned ?></h2>
+			<h1 class="mt-1.5 text-base">Cleaned Purok</h1>
+		</div>
+
+		<span class="text-6xl opacity-25 text-black"><i class="ri-sparkling-2-line"></i></span>
 
 		</div>
+
+		<div class="flex items-end justify-center mt-3">
+		<a href="cleaned.php" class="text-white font-bold hover:underline">More info →</a>
+		</div>
+
+</div>
+
+<div class="bg-indigo-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+
+		<div class="flex justify-between items-center">
+
+		<div class="flex flex-col">
+			<h2 class="text-4xl font-bold"><?php echo $totalAlbum ?></h2>
+			<h1 class="mt-1.5 text-base">Documentations</h1>
+		</div>
+
+		<span class="text-6xl opacity-25 text-black"><i class="ri-gallery-fill"></i></span>
+
+		</div>
+
+		<div class="flex items-end justify-center mt-3">
+		<a href="doc.php" class="text-white font-bold hover:underline">More info →</a>
+		</div>
+
+</div>
+
+
+		</div>
+
+
+		<div id="barchart_material" style="width: 900px; height: 500px; margin-top:2rem;"></div>
 		
 		
 		<?php include"footer.php" ?>
