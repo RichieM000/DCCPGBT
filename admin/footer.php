@@ -17,7 +17,7 @@
 <script src="assets/js/copy/datatables.min.js"></script>
 <script src="assets/js/copy/pdfmake.min.js"></script>
 <script src="assets/js/copy/vfs_fonts.js"></script>
-<script src="assets/js/copy/custom.js"></script>
+<!-- <script src="assets/js/copy/custom.js"></script> -->
 <script src="assets/js/bootstrap-tagsinput.js"></script>
 
 
@@ -70,7 +70,27 @@
 	}
 
 	?>
-		
+		<script>
+			// =============  Data Table - (Start) ================= //
+
+$(document).ready(function() {
+    var table = $('#example').DataTable({
+        order: [],
+       buttons: [
+         'print', 'copy', 'excel', 'csv'
+		 
+       ],
+
+	   orderMulti: true, // Enable multi-column sorting
+	   
+	   
+     });
+     table.buttons().container()
+     .appendTo('#example_wrapper .col-md-6:eq(0)');
+   });
+// =============  Data Table - (End) ================= //
+
+		</script>
 
 
 

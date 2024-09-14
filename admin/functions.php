@@ -5,16 +5,17 @@ require_once 'connections.php';
 
 
 function getUserRequest($connections) {
-    $query = "SELECT * FROM tbl_request"; 
+    $query = "SELECT * FROM tbl_request ORDER BY id DESC"; 
     $result = mysqli_query($connections, $query);
   
     $userTasks = array();
     while($row = mysqli_fetch_assoc($result)) {
       $userTasks[] = $row;
     }
-    mysqli_close($connections);
+    // mysqli_close($connections);
     return $userTasks;
 }
+
 function countRequest($connections){
   // Query to get the count of registered users
   $sql = "SELECT COUNT(*) AS total_request FROM tbl_request";
@@ -29,8 +30,9 @@ function countRequest($connections){
 }
 
 
+
 function getPurok($connections){
-  $query = "SELECT * FROM tbl_purok";
+  $query = "SELECT * FROM tbl_purok ORDER BY id DESC";
   $result = mysqli_query($connections, $query);
 
   $puroklist = array();
@@ -227,10 +229,34 @@ function countCleaned($connections){
     return $totalcleaned;
 }
 
+function calendar($connections) {
+  $sql = "  SELECT e.id, e.title, e.location, e.start_date, e.end_date, e.status, 
+  GROUP_CONCAT(DISTINCT CONCAT(t.name, ' (', et.quantity, ')') ORDER BY t.name SEPARATOR ', ') AS tools,
+  GROUP_CONCAT(DISTINCT CONCAT(s.fname, ' ', s.lname) ORDER BY s.fname SEPARATOR ', ') AS staff
+FROM tbl_eventsched e
+LEFT JOIN tbl_event_tools et ON e.id = et.event_id
+LEFT JOIN tbl_tools t ON et.tool_id = t.id
+LEFT JOIN tbl_event_staff es ON e.id = es.event_id
+LEFT JOIN tbl_staff s ON es.staff_id = s.id
+WHERE e.status = 'in progress'
+GROUP BY e.id, e.title, e.location, e.start_date, e.end_date";
+  
+$stmt = $connections->prepare($sql);
+$stmt->execute();
+$result = $stmt->get_result();
 
+$calendars = array();
+while ($row = $result->fetch_assoc()) {
+$calendars[] = $row;
+}
+
+$stmt->close();
+
+return $calendars;
+}
 
 function getEvent($connections) {
-  $sql = "  SELECT e.id, e.title, e.location, e.start_date, e.end_date, e.status, 
+  $sql = "  SELECT e.id, e.request_id, e.title, e.location, e.start_date, e.end_date, e.status, 
   GROUP_CONCAT(DISTINCT CONCAT(t.name, ' (', et.quantity, ')') ORDER BY t.name SEPARATOR ', ') AS tools,
   GROUP_CONCAT(DISTINCT CONCAT(s.fname, ' ', s.lname) ORDER BY s.fname SEPARATOR ', ') AS staff
 FROM tbl_eventsched e
@@ -253,6 +279,7 @@ $stmt->close();
 
 return $events;
 }
+
 function countEvent($connections){
   // Query to get the count of registered users
   $sql = "SELECT COUNT(*) AS total_event FROM tbl_eventsched";
@@ -267,7 +294,16 @@ function countEvent($connections){
 }
 
 
+function countVolunteer($connections){
+  $sql = "SELECT COUNT(*) AS total_volunteer FROM tbl_volunteers";
+  $result = mysqli_query($connections, $sql);
 
+  $row = mysqli_fetch_assoc($result);
+
+  $totalvolunteer = $row['total_volunteer'];
+
+  return $totalvolunteer;
+}
 
 
 function getVolunteer($connections){
@@ -285,8 +321,6 @@ function getVolunteer($connections){
 
   $stmt->close();
   return $volunteers;
-
-
 }
 
 
@@ -300,7 +334,7 @@ function getStaffs($connections){
   while($row = mysqli_fetch_assoc($result)) {
     $staffs[] = $row;
   }
-
+  
   return $staffs;
 
 }

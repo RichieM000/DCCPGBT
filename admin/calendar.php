@@ -1,19 +1,25 @@
-<?php session_start() ?>
 
+<?php
+session_start();
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 
 <?php
+
     include 'functions.php';
     $staffs = getStaffs($connections);
     $staffList = getUsers($connections);
-    $events = getEvent($connections);
+    $calendars = calendar($connections);
     $tools = getTools($connections); // assuming $connections is your database connection
     $userTasks = getUserRequest($connections);
 $availableTags = array_column(array_map(function($tool) {
     return $tool['tool_data'];
 }, $tools), 'name');
+
+
 ?>
 
 <?php include "header.php"?>
@@ -27,10 +33,9 @@ $availableTags = array_column(array_map(function($tool) {
     color: white;
     border-radius: 5px;
     padding: 0 8px;
-    margin: 2px;
-}
-
-.tag .remove {
+    margin: calendars
+      }
+.tacalendarmove {
     margin-left: 4px;
     cursor: pointer;
 }
@@ -72,12 +77,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         events: [
-            <?php foreach($events as $event): ?>
+            <?php foreach($calendars as $calendar):
+                // Convert the dates to DateTime objects for accurate comparison
+                $currentDate = new DateTime(); // Current date
+                $eventEndDate = new DateTime($calendar['end_date']); // Event end date
+                
+                // Check if the current date is greater than the end date
+                $isExpired = ($currentDate > $eventEndDate); 
+
+                $eventTitle = $isExpired ? 'Missed the deadline' : $calendar['title'];
+                
+                ?>
             {
-                title: "<?php echo $event['title']; ?>",
-                start: "<?php echo $event['start_date']; ?>",
-                end: "<?php echo $event['end_date']; ?>",
-                url: "activities.php"
+                title: "<?php echo $eventTitle; ?>",
+                start: "<?php echo $calendar['start_date']; ?>",
+                end: "<?php echo $calendar['end_date']; ?>",
+                url: "activities.php",
+                color: "<?php echo $isExpired ? 'red' : '#3788d8'; ?>" // Set color to red if expired
             },
             <?php endforeach; ?>
         ]
@@ -98,10 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
 					<div class="mb-4">
                         <label for="title" class="block font-medium">Even Title</label>
                         <input type="text" name="title" id="title" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                    
                     </div>
-					<div class="mb-4">
+                    <div class="mb-4">
                         <label for="location" class="block font-medium">Location</label>
-                        <input type="text" name="location" id="location" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <input type="text" name="location" id="location" value="<?php echo isset($_SESSION['address']) ? $_SESSION['address'] : ''; ?>" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
                     </div>
     <div class="tools-container mb-4">
     <label class="font-semibold" for="tools">Tools:</label>
@@ -150,7 +167,7 @@ window.onload = function() {
 
 <div class="staffs-container mb-4">
   <label class="font-semibold" for="staff">Assign Staff:</label>
-  <select class="border border-gray-300 rounded-md" id="staff" name="astaff">
+  <select class="border border-gray-300 rounded-md capitalize" id="staff" name="astaff">
             <?php
             if (!empty($staffs)) {
                 foreach ($staffs as $staff) {

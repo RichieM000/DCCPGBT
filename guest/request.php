@@ -8,7 +8,45 @@ require_once 'functions.php';
 // Assuming you have a function to get the ID from the database
 // Example: Fetching the ID from the database
 $userTasks = getUserRequest($connections);
+$events = getEvent($connections);
 
+// Convert events to an associative array for quick lookup by request ID
+$eventsByRequestId = [];
+foreach ($events as $event) {
+    $eventsByRequestId[$event['request_id']] = $event['end_date'];
+}
+
+$currentDate = new DateTime(); // Current date
+
+// Check and update status for each task
+foreach ($userTasks as $task) {
+    $endDate = isset($eventsByRequestId[$task['id']]) ? new DateTime($eventsByRequestId[$task['id']]) : null;
+    
+    // Check if the current date is greater than the end date
+    $isExpired = $endDate && $currentDate > $endDate;
+    $notExpired = $endDate && $currentDate < $endDate;
+    
+    $requestStatus = $isExpired ? 'Missed the Deadline' : $task['status'];
+    
+    // Update the status in the database if needed
+    if ($requestStatus === 'Missed the Deadline' && $task['status'] !== 'Missed the Deadline') {
+        $sql = "UPDATE tbl_request SET status = ? WHERE id = ?";
+        $stmt = $connections->prepare($sql);
+        $stmt->bind_param("si", $requestStatus, $task['id']);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    $requestStatus = $notExpired ? 'in progress' : $task['status'];
+
+    if ($requestStatus === 'in progress' && $task['status'] !== 'in progress') {
+        $sql = "UPDATE tbl_request SET status = ? WHERE id = ?";
+        $stmt = $connections->prepare($sql);
+        $stmt->bind_param("si", $requestStatus, $task['id']);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
 ?>
 
 
@@ -55,7 +93,20 @@ $userTasks = getUserRequest($connections);
             </tr>
         </thead>
         <tbody>
-            <?php foreach($userTasks as $task){ ?>
+            <?php foreach($userTasks as $task){
+                
+                    
+                // Get the end_date for the current task
+            $endDate = isset($eventsByRequestId[$task['id']]) ? new DateTime($eventsByRequestId[$task['id']]) : null;
+            
+            // Check if the current date is greater than the end date
+            $isExpired = $endDate && $currentDate > $endDate;
+            
+            $requestStatus = $isExpired ? 'missed the deadline' : $task['status'];
+                
+                
+                
+                ?>
             <tr>
                 <td><?php echo $task['firstname'] ?></td>
                 <td><?php echo $task['lastname'] ?></td>
@@ -66,22 +117,22 @@ $userTasks = getUserRequest($connections);
                 <td><?php echo $task['reason'] ?></td>
                 <td><?php echo $task['comments'] ?></td>
                 <td class="whitespace-nowrap capitalize" style="color: <?php 
-    switch ($task['status']) {
+    switch ($requestStatus) {
         case 'pending':
-            echo 'green';
+            echo 'gray';
             break;
         case 'in progress':
             echo 'blue';
             break;
-        case 'done':
-            echo 'gray';
+        case 'complete':
+            echo 'green';
             break;
         default:
             echo 'red';
             break;
     }
 ?>">
-    <?php echo $task['status'] ?>
+    <?php echo $requestStatus ?>
 </td>
 
       

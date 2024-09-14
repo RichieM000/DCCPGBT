@@ -13,6 +13,7 @@ $staffId = $_SESSION['id'];
 	$totalcleaned = countCleaned($connections);
 	$eventCount = countStaffEvent($connections, $staffId);
 	$totalAlbum = countAlbum($connections);
+	$totalvolunteer = countVolunteer($connections);
 ?>
 
 
@@ -117,6 +118,48 @@ $staffId = $_SESSION['id'];
 		});
 		</script>
 		
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['bar']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Purok/Year', 'Paper', 'Glass', 'Organic','Plastic'],
+      
+     <?php 
+     	$query = "SELECT purok, date, paper, glass, organic, plastic FROM tbl_waste";
+     	$stmt = mysqli_prepare($connections, $query);
+     	mysqli_stmt_execute($stmt);
+     	$result = mysqli_stmt_get_result($stmt);
+		while($data = mysqli_fetch_array($result)){
+			
+			$date = $data['date'];
+			$year = date('Y-m-d', strtotime($date));
+			$purok = $data['purok'];
+			$paper = $data['paper'];
+			$glass = $data['glass'];
+			$organic = $data['organic'];
+			$plastic = $data['plastic'];
+     ?> 
+     ['<?php echo $purok; ?> - <?php echo $year ?>', <?php echo $paper; ?>, <?php echo $glass; ?>, <?php echo $organic; ?>, <?php echo $plastic; ?>],
+
+     <?php } ?>
+    ]);
+
+    var options = {
+      chart: {
+        title: 'Waste Collected',
+        subtitle: 'Waste Segregation Chart',
+      },
+      bars: 'horizontal' // Required for Material Bar Charts.
+    };
+
+    var chart = new google.charts.Bar(document.getElementById('barchart_material'));
+
+    chart.draw(data, google.charts.Bar.convertOptions(options));
+  }
+</script>
 		
 		<div class="row">
 			<div class="col-sm-12">
@@ -138,7 +181,7 @@ $staffId = $_SESSION['id'];
   <a href="#" class="text-white font-bold hover:underline mt-2">More info →</a>
 </div> -->
 
-<div class="grid grid-cols-4">
+<div class="grid grid-cols-5">
 
 
 
@@ -170,7 +213,7 @@ $staffId = $_SESSION['id'];
 
 	
 
-<div class="bg-orange-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+<div class="bg-orange-500 shadown-md rounded-md text-white pt-4 px-4 m-2 <?= ($totalrequest > 0) ? 'relative' : ''; ?>">
 
 		<div class="flex justify-between items-center">
 
@@ -187,6 +230,12 @@ $staffId = $_SESSION['id'];
 		<a href="request.php" class="text-white font-bold hover:underline">More info →</a>
 		</div>
 
+		<?php if ($totalrequest > 0) { ?>
+        <span class="absolute top-0 right-0 h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span class="absolute top-0 right-0 inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+        </span>
+    <?php } ?>
 </div>
 
 <div class="bg-green-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
@@ -230,8 +279,29 @@ $staffId = $_SESSION['id'];
 
 </div>
 
+<div class="bg-red-400 shadown-md rounded-md text-white pt-4 px-4 m-2">
+
+		<div class="flex justify-between items-center">
+
+		<div class="flex flex-col">
+			<h2 class="text-4xl font-bold"><?php echo $totalvolunteer ?></h2>
+			<h1 class="mt-1.5 text-base">Volunteers</h1>
+		</div>
+
+		<span class="text-6xl opacity-25 text-black"><i class="ri-team-fill"></i></span>
 
 		</div>
+
+		<div class="flex items-end justify-center mt-3">
+		<a href="list.php" class="text-white font-bold hover:underline">More info →</a>
+		</div>
+
+</div>
+
+
+		</div>
+
+		<div id="barchart_material" style="width: 900px; height: 500px; margin-top:2rem;"></div>
 		
 		
 		<?php include"footer.php" ?>

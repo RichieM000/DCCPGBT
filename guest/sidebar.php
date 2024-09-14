@@ -31,7 +31,7 @@ session_start();
 
 				<div class="sui-normal">
 					<a href="#" class="user-link">
-						<img src="assets/images/thumb-1@2x.png" width="55" alt="" class="img-circle" />
+					<img src="assets/uploads/<?php echo isset($_SESSION['file_img']) ? $_SESSION['file_img'] : 'noimage.png'; ?>" width="75" height="75" alt="" class="img-circle" />
 
 						<span>Welcome,</span>
 						<strong><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : 'User'; ?></strong>

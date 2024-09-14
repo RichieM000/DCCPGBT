@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
        
         <div class="flex justify-end m-4">
-        <a class="bg-blue-500 text-white font-bold p-1.5 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out" href="calendar.php">Add New</a>
+        <!-- <a class="bg-blue-500 text-white font-bold p-1.5 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out" href="calendar.php">Add New</a> -->
         </div>
         <h1 class="font-bold mb-4 text-xl">Cleanup Events Assigned To You</h1>
         <div class="data_table">

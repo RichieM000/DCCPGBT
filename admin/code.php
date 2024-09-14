@@ -19,33 +19,60 @@ require_once 'connections.php';
 
 
 // residents request submit
-if(isset($_POST['submitrequest'])){
-    $firstname = ($_POST['firstname']);
-    $lastname = ($_POST['lastname']);
-    $address = ($_POST['address']);
-    $phone = ($_POST['phone']);
-    $email = ($_POST['email']);
-    $gender = ($_POST['gender']);
-    $reason = ($_POST['reason']);
-    $comments = ($_POST['comments']);
-    $status = "pending";
-
-
-    $sql = "INSERT INTO tbl_request (firstname, lastname, address, phone, email, gender, reason, comments, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $connections->prepare($sql);
-
-    $stmt->bind_param("sssssssss", $firstname, $lastname, $address, $phone, $email, $gender, $reason, $comments, $status);
-
-    if ($stmt->execute()) {
-        $_SESSION['status'] = "Request Submitted Successfully!";
-        $_SESSION['status_code'] = "success";
-        header('Location: ../index.php');
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    if(isset($_POST['request'])){
+        $firstname = ($_POST['firstname']);
+        $lastname = ($_POST['lastname']);
+        $address = ($_POST['address']);
+        $phone = ($_POST['phone']);
+        $email = ($_POST['email']);
+        $gender = ($_POST['gender']);
+        $reason = ($_POST['reason']);
+        $comments = ($_POST['comments']);
+        $status = "pending";
+    
+        $errors = [];
+    
+        if (preg_match('/[^a-zA-Z,. ]/', $firstname)) {
+            $errors['firstname'] = "Error: Firstname can only contain letters.";
+        }
         
-    } else {
-        echo "Error executing statement: " . $stmt->error;
+        if (preg_match('/[^a-zA-Z,. ]/', $lastname)) {
+            $errors['lastname'] = "Error: Lastname can only contain letters.";
+        }
         
+        if (!preg_match('/^(09|\+639)\d{9}$/', $phone)) {
+            $errors['phone'] = "Error: Invalid Philippine mobile number.";
+        }
+        
+        if (!empty($errors)) {
+            echo json_encode($errors);
+            exit;
+        }else{
+
+       
+        
+    
+        $sql = "INSERT INTO tbl_request (firstname, lastname, address, phone, email, gender, reason, comments, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $connections->prepare($sql);
+    
+        $stmt->bind_param("sssssssss", $firstname, $lastname, $address, $phone, $email, $gender, $reason, $comments, $status);
+    
+      // ... (rest of the code remains the same)
+
+if ($stmt->execute()) {
+    echo json_encode(array('status' => 'success', 'message' => 'Request Submitted Successfully!'));
+    exit;
+} else {
+    echo json_encode(array('status' => 'error', 'message' => 'Delete Failed'));
+    exit;
+}
+
+        $stmt->close();
+    }
     }
 }
+
 
 
 // submit cleanup schedule
@@ -58,10 +85,12 @@ if (isset($_POST['submitevent'])) {
     $staff_ids = $_POST['astaff'];
     $start_date = trim($_POST['start_date']);
     $end_date = trim($_POST['end_date']);
-    $request_id = isset($_SESSION['request_id']) ? $_SESSION['request_id'] : null;
+    $request_id = isset($_SESSION['request_id']) ? $_SESSION['request_id'] : '';
     
     
     $event_id = null; // Initialize event_id
+
+    
 
     // Start a transaction
     $connections->begin_transaction();
@@ -134,6 +163,7 @@ if (isset($_POST['submitevent'])) {
             throw new Exception("Please select staff members.");
         }
         unset($_SESSION['request_id']);
+        unset($_SESSION['address']);
         // Commit the transaction
         $connections->commit();
 
@@ -141,6 +171,7 @@ if (isset($_POST['submitevent'])) {
         $_SESSION['status'] = "Request Submitted Successfully!";
         $_SESSION['status_code'] = "success";
         header('Location: calendar.php');
+        
         
     } catch (Exception $e) {
         // Rollback the transaction if there was an error
@@ -195,6 +226,9 @@ if (isset($_POST['updateevent'])) {
     $staff_ids = isset($_POST['astaff']) ? $_POST['astaff'] : [];
     $start_date = trim($_POST['start_date']);
     $end_date = trim($_POST['end_date']);
+
+
+  
 
     // Start a transaction
     $connections->begin_transaction();
@@ -338,11 +372,12 @@ if (!empty($tools) && !empty($quantities) && count($tools) == count($quantities)
         // Commit the transaction
         $connections->commit();
 
-        // Success message
-        $_SESSION['status'] = "Updated Successfully!";
-        $_SESSION['status_code'] = "success";
-        header('Location: activities.php');
-        exit;
+      // Success message
+      $_SESSION['status'] = "Updated Successfully!";
+      $_SESSION['status_code'] = "success";
+      header('Location: activities.php');
+      exit;
+        
     } catch (Exception $e) {
         // Rollback the transaction if there was an error
         $connections->rollback();
@@ -456,7 +491,8 @@ if (isset($_GET['idevent'])) {
 
 
 // add staff
-if (isset($_POST['submit'])) {
+if($_SERVER['REQUEST_METHOD'] == "POST"){
+if (isset($_POST['addstaff'])) {
     $fname = $_POST["fname"];
     $lname = $_POST["lname"];
     $address = $_POST["address"];
@@ -469,12 +505,39 @@ if (isset($_POST['submit'])) {
     $cpassword = $_POST["cpassword"];
  
     // Check if passwords match
+    $errors = array();
+
+    // Check if passwords match
     if ($password != $cpassword) {
-        $_SESSION['status'] = "Password does not match!";
-        $_SESSION['status_code'] = "error";
-        header('Location: addstaff.php');
-        exit;
+        $errors['cpassword'] = "Password does not match!";
     }
+    if (preg_match('/[^a-zA-Z]/', $fname)) {
+        $errors['fname'] = "Firstname can only contain letters.";
+    }
+    
+    if (preg_match('/[^a-zA-Z]/', $lname)) {
+        $errors['lname'] = "Lastname can only contain letters.";
+    }
+    
+    if (!preg_match('/^(09|\+639)\d{9}$/', $phone)) {
+        $errors['phone'] = "Invalid PH mobile number.";
+    }
+    if(!is_numeric($age)){
+        $errors['age'] = "Age can only contain numbers";
+    }
+
+    if (count($errors) > 0) {
+        $_SESSION['errors'] = $errors;
+        $_SESSION['oldvalue'] = $_POST;
+        header('Location: addstaff.php');
+       
+        exit;
+
+        
+    }
+        
+    
+
  
     // Hash password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
@@ -550,6 +613,7 @@ if (isset($_POST['submit'])) {
         
     }
  }
+}
 
 
 
@@ -755,6 +819,7 @@ if(isset($_GET['idstaff'])){
 if(isset($_POST['confirmrequest'])){
     $action = $_POST["action"];
     $id = $_POST["id"];
+    $location = $_POST['location'];
 
     // Update the status column in the tbl_request table
     $sql = "UPDATE tbl_request SET status = '$action' WHERE id = '$id'"; // Add your WHERE clause here
@@ -763,9 +828,11 @@ if(isset($_POST['confirmrequest'])){
         // Get the updated request ID
          // Get the updated request ID
          $request_id = $id;
+         $location_session = $location;
 
          // Store the request ID in a session variable
          $_SESSION['request_id'] = $request_id;
+         $_SESSION['address'] = $location_session;
 
         $_SESSION['status'] = "Request Confirmed! Add this request to the Clean Up Schedule!";
         $_SESSION['status_code'] = "success";
@@ -804,6 +871,31 @@ if (isset($_POST['completerequest'])) {
         echo "Error updating status: " . mysqli_error($connections);
     }
 }
+// complete activity
+if(isset($_POST['completecleanup'])){
+    $action = $_POST['action'];
+    $id = $_POST['id'];
+
+    date_default_timezone_set('Asia/Manila');
+    $currentDate = date('Y-m-d H:i:s');
+
+    // Start a transaction
+    mysqli_begin_transaction($connections);
+    $sql2 = "UPDATE tbl_eventsched SET status = '$action', date = '$currentDate' WHERE id = '$id'";
+
+    if(mysqli_query($connections, $sql2)){
+           // Commit the transaction
+           mysqli_commit($connections);
+           $_SESSION['status'] = "Request Completed";
+           $_SESSION['status_code'] = "success";
+           header('Location: activities.php');
+       } else {
+           // Rollback the transaction
+           mysqli_rollback($connections);
+           echo "Error updating status: " . mysqli_error($connections);
+       }
+    }
+
 
 
 
@@ -903,7 +995,22 @@ if(isset($_POST['updatepurok'])){
 
     $stmt->close();
 }
+// delete purok
+if(isset($_GET['idpurok'])){
+    
+    $id = $_GET["idpurok"];
 
+    // Update the status column in the tbl_request table
+    $sql = "DELETE FROM tbl_purok WHERE id = '$id'"; // Add your WHERE clause here
+
+    if (mysqli_query($connections, $sql)) {
+        $_SESSION['status'] = "Delete Success!";
+        $_SESSION['status_code'] = "success";
+        header('Location: purok.php');
+    } else {
+        echo "Error updating status: " . mysqli_error($connections);
+    }
+}
 
 
 // add tools
@@ -1602,22 +1709,40 @@ if(isset($_POST['addvolunteer'])){
     $address = $_POST['address'];
     $cleanup = $_POST['cleanup'];
 
+
+    $errors = array();
+    
+    if (preg_match('/[^a-zA-Z]/', $firstname)) {
+        $errors['firstname'] = "Firstname can only contain letters.";
+    }
+    if (preg_match('/[^a-zA-Z]/', $lastname)) {
+        $errors['lastname'] = "Lastname can only contain letters.";
+    }
+    
+    if (!preg_match('/^(09|\+639)\d{9}$/', $contact)) {
+        $errors['contact'] = "Invalid PH mobile number.";
+    }
+    
+    if (!empty($errors)) {
+        echo json_encode($errors);
+        exit;
+    }else{
+
     $sql = "INSERT INTO tbl_volunteers (firstname, lastname, gender, contact, address, eventsched_id) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $connections->prepare($sql);
     $stmt->bind_param("sssssi", $firstname, $lastname, $gender, $contact, $address, $cleanup);
 
     if ($stmt->execute()) {
-        $_SESSION['status'] = "Request Submitted Successfully!";
-        $_SESSION['status_code'] = "success";
-        header('Location: list.php');
-        
+        echo json_encode(array('status' => 'success', 'message' => 'Added Successfully!'));
+        exit;
     } else {
-        echo "Error executing statement: " . $stmt->error;
-        
+        echo json_encode(array('status' => 'error', 'message' => 'Action Failed'));
+        exit;
     }
 
     $stmt->close();
     
+}
 }
 // edit volunteer
 if(isset($_POST['list_edit_btn'])){
@@ -1652,25 +1777,40 @@ if(isset($_POST['updatevolunteer'])){
     $address = $_POST['address'];
     $cleanup = $_POST['cleanup'];
 
+    $errors = array();
+    
+    if (preg_match('/[^a-zA-Z]/', $firstname)) {
+        $errors['firstname'] = "Firstname can only contain letters.";
+    }
+    if (preg_match('/[^a-zA-Z]/', $lastname)) {
+        $errors['lastname'] = "Lastname can only contain letters.";
+    }
+    
+    if (!preg_match('/^(09|\+639)\d{9}$/', $contact)) {
+        $errors['contact'] = "Error: Invalid Philippine mobile number.";
+    }
+    
+    if (!empty($errors)) {
+        echo json_encode($errors);
+        exit;
+    }else{
+
     $stmt = $connections->prepare("UPDATE tbl_volunteers SET firstname=?, lastname=?, gender=?, contact=?, address=?, eventsched_id=? WHERE id=?");
     $stmt->bind_param("sssssii", $firstname, $lastname, $gender, $contact, $address, $cleanup, $id);
 
-    try {
-        $stmt->execute();
-        if ($stmt->affected_rows > 0) {
-            $_SESSION['status'] = "Deleted successfully!";
-            $_SESSION['status_code'] = "success";
-            header("Location: list.php");
+    
+        if ($stmt->execute()) {
+            echo json_encode(array('status' => 'success', 'message' => 'Success!'));
+            exit;
         } else {
-            $_SESSION['status'] = "Delete Failed";
-            $_SESSION['status_code'] = "error";
-            header("Location: list.php");
+            echo json_encode(array('status' => 'error', 'message' => 'Action Failed'));
+            exit;
         }
-    } catch (Exception $e) {
-        echo 'Error deleting staff data: '. $e->getMessage();
-    }
+    
+    
 
     $stmt->close();
+}
 }
 // delete volunteer
 if(isset($_GET['idlist'])){
@@ -1721,6 +1861,7 @@ if(isset($_POST['complete_edit_btn'])){
 }
 // add cleaned purok
 if(isset($_POST['submitclean'])){
+    $title = $_POST['title'];
     $purok = $_POST['purok'];
     $date = $_POST['date'];
     $paper = $_POST['paper'];
@@ -1734,14 +1875,14 @@ if(isset($_POST['submitclean'])){
     $sql2 = "UPDATE tbl_eventsched SET status = '$action' WHERE request_id = '$id'";
     $sql3 = "UPDATE tbl_request SET status = '$action' WHERE id = '$id'";  
 
-    $sql = "INSERT INTO tbl_waste (purok, date, paper, glass, organic, plastic, totalwaste) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO tbl_waste (title, purok, date, paper, glass, organic, plastic, totalwaste) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $connections->prepare($sql);
     if (!$stmt) {
         echo "Prepare failed: (" . $connections->errno . ") " . $connections->error;
         exit;
     }
   
-    $stmt->bind_param("sssssss", $purok, $date, $paper, $glass, $organic, $plastic, $totalwaste);
+    $stmt->bind_param("ssssssss", $title, $purok, $date, $paper, $glass, $organic, $plastic, $totalwaste);
     try {
         $stmt->execute();
         if ($stmt->affected_rows > 0) {
@@ -1814,6 +1955,7 @@ if(isset($_POST['clean_edit_btn'])){
 if(isset($_POST['updateclean'])){
 
     $id = $_POST['id'];
+    $title = $_POST['title'];
     $purok = $_POST['purok'];
     $date = $_POST['date'];
     $paper = $_POST['paper'];
@@ -1823,8 +1965,8 @@ if(isset($_POST['updateclean'])){
     $totalwaste = $paper + $glass + $organic + $plastic;
 
 
-    $stmt = $connections->prepare("UPDATE tbl_waste SET purok=?, date=?, paper=?, glass=?, organic=?, plastic=?, totalwaste=? WHERE id=?");
-    $stmt->bind_param('sssssssi', $purok, $date, $paper, $glass, $organic, $plastic, $totalwaste, $id);
+    $stmt = $connections->prepare("UPDATE tbl_waste SET title=?, purok=?, date=?, paper=?, glass=?, organic=?, plastic=?, totalwaste=? WHERE id=?");
+    $stmt->bind_param('ssssssssi', $title, $purok, $date, $paper, $glass, $organic, $plastic, $totalwaste, $id);
 
     try {
         $stmt->execute();
@@ -1871,7 +2013,7 @@ if(isset($_GET['idclean'])){
 }
 
 
-$connections->close();
+// $connections->close();
 ob_end_flush();
 
 ?>

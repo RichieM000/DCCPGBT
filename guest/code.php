@@ -1597,22 +1597,40 @@ if(isset($_POST['addvolunteer'])){
     $address = $_POST['address'];
     $cleanup = $_POST['cleanup'];
 
+
+    $errors = array();
+    
+    if (preg_match('/[^a-zA-Z]/', $firstname)) {
+        $errors['firstname'] = "Firstname can only contain letters.";
+    }
+    if (preg_match('/[^a-zA-Z]/', $lastname)) {
+        $errors['lastname'] = "Lastname can only contain letters.";
+    }
+    
+    if (!preg_match('/^(09|\+639)\d{9}$/', $contact)) {
+        $errors['contact'] = "Invalid PH mobile number.";
+    }
+    
+    if (!empty($errors)) {
+        echo json_encode($errors);
+        exit;
+    }else{
+
     $sql = "INSERT INTO tbl_volunteers (firstname, lastname, gender, contact, address, eventsched_id) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $connections->prepare($sql);
     $stmt->bind_param("sssssi", $firstname, $lastname, $gender, $contact, $address, $cleanup);
 
     if ($stmt->execute()) {
-        $_SESSION['status'] = "Request Submitted Successfully!";
-        $_SESSION['status_code'] = "success";
-        header('Location: list.php');
-        
+        echo json_encode(array('status' => 'success', 'message' => 'Added Successfully!'));
+        exit;
     } else {
-        echo "Error executing statement: " . $stmt->error;
-        
+        echo json_encode(array('status' => 'error', 'message' => 'Action Failed'));
+        exit;
     }
 
     $stmt->close();
     
+}
 }
 // edit volunteer
 if(isset($_POST['list_edit_btn'])){
@@ -1647,25 +1665,40 @@ if(isset($_POST['updatevolunteer'])){
     $address = $_POST['address'];
     $cleanup = $_POST['cleanup'];
 
+    $errors = array();
+    
+    if (preg_match('/[^a-zA-Z]/', $firstname)) {
+        $errors['firstname'] = "Firstname can only contain letters.";
+    }
+    if (preg_match('/[^a-zA-Z]/', $lastname)) {
+        $errors['lastname'] = "Lastname can only contain letters.";
+    }
+    
+    if (!preg_match('/^(09|\+639)\d{9}$/', $contact)) {
+        $errors['contact'] = "Error: Invalid Philippine mobile number.";
+    }
+    
+    if (!empty($errors)) {
+        echo json_encode($errors);
+        exit;
+    }else{
+
     $stmt = $connections->prepare("UPDATE tbl_volunteers SET firstname=?, lastname=?, gender=?, contact=?, address=?, eventsched_id=? WHERE id=?");
     $stmt->bind_param("sssssii", $firstname, $lastname, $gender, $contact, $address, $cleanup, $id);
 
-    try {
-        $stmt->execute();
-        if ($stmt->affected_rows > 0) {
-            $_SESSION['status'] = "Deleted successfully!";
-            $_SESSION['status_code'] = "success";
-            header("Location: list.php");
+    
+        if ($stmt->execute()) {
+            echo json_encode(array('status' => 'success', 'message' => 'Success!'));
+            exit;
         } else {
-            $_SESSION['status'] = "Delete Failed";
-            $_SESSION['status_code'] = "error";
-            header("Location: list.php");
+            echo json_encode(array('status' => 'error', 'message' => 'Action Failed'));
+            exit;
         }
-    } catch (Exception $e) {
-        echo 'Error deleting staff data: '. $e->getMessage();
-    }
+    
+    
 
     $stmt->close();
+}
 }
 // delete volunteer
 if(isset($_GET['idlist'])){

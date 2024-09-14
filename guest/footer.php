@@ -1,4 +1,4 @@
-Footer
+
  
  <footer class="main">
 			 
@@ -17,7 +17,7 @@ Footer
  <script src="assets/js/copy/datatables.min.js"></script>
  <script src="assets/js/copy/pdfmake.min.js"></script>
  <script src="assets/js/copy/vfs_fonts.js"></script>
- <script src="assets/js/copy/custom.js"></script>
+ <!-- <script src="assets/js/copy/custom.js"></script> -->
  <script src="assets/js/bootstrap-tagsinput.js"></script>
  
  
@@ -71,7 +71,22 @@ Footer
  
 	 ?>
 		 
- 
+ <script>
+	// =============  Data Table - (Start) ================= //
+
+$(document).ready(function() {
+    var table = $('#example').DataTable({
+      
+       buttons: [
+         'print', 'copy', 'excel', 'csv'
+       ]
+     });
+     table.buttons().container()
+     .appendTo('#example_wrapper .col-md-6:eq(0)');
+   });
+// =============  Data Table - (End) ================= //
+
+ </script>
  
  
 	 

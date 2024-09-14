@@ -45,10 +45,10 @@ $albums = getAlbum($connections);
             <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-bold">Gallery</h1>
                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-bs-toggle="modal" data-bs-target="#newalbum">
-                    Add New
+                    Add Album
                 </button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 			<?php foreach($albums as $album){
                 
                    // Fetch the album ID for the current album in the loop
@@ -66,7 +66,7 @@ $albums = getAlbum($connections);
         $formattedDateTime = $dateTime->format('F j, Y g:i A');
         ?>
 					
-                    <a href="photos.php?id=<?php echo $album['album_data']['id']; ?>"><img src="<?php echo $album['image_src']; ?>" alt="Album Cover" class="w-full cursor-pointer rounded-lg hover:scale-105 transition duration-300 ease-in-out"></a>
+                    <a href="photos.php?id=<?php echo $album['album_data']['id']; ?>"><img src="<?php echo $album['image_src']; ?>" alt="Album Cover" class="w-full object-cover cursor-pointer rounded-lg hover:scale-105 transition duration-300 ease-in-out"></a>
                     <h2 class="text-xl font-bold mt-2"><?php echo $album['album_data']['album_title']; ?></h2>
                     <p class="text-gray-600 font-semibold mt-1"><?php echo $album['album_data']['album_descrip'] ?></p>
                     <p class="text-gray-600 text-xs mt-1"><?php echo $formattedDateTime; ?></p>

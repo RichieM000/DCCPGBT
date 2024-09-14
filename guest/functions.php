@@ -12,7 +12,7 @@ function getUserRequest($connections) {
     while($row = mysqli_fetch_assoc($result)) {
       $userTasks[] = $row;
     }
-    mysqli_close($connections);
+    
     return $userTasks;
 }
 function countRequest($connections){
@@ -178,6 +178,24 @@ function getAlbumImageCount($albumId, $connections) {
   return $row['image_count'];
 }
 
+
+function completeEvent($connections){
+  $sql = "SELECT * FROM tbl_eventsched WHERE status = 'complete'";
+  
+  $stmt = $connections->prepare($sql);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  $completes = array();
+  while($row = $result->fetch_assoc()){
+    $completes[] = $row;
+  }
+
+  $stmt->close();
+
+  return $completes;
+}
+
 function cleanedPurok($connections){
   $sql = "SELECT * FROM tbl_waste";
   
@@ -220,7 +238,7 @@ function countCleaned($connections){
 
 
 function getEvent($connections) {
-  $sql = "  SELECT e.id, e.title, e.location, e.start_date, e.end_date, e.status, 
+  $sql = "  SELECT e.id, e.title, e.request_id, e.location, e.start_date, e.end_date, e.status, 
   GROUP_CONCAT(DISTINCT CONCAT(t.name, ' (', et.quantity, ')') ORDER BY t.name SEPARATOR ', ') AS tools,
   GROUP_CONCAT(DISTINCT CONCAT(s.fname, ' ', s.lname) ORDER BY s.fname SEPARATOR ', ') AS staff
 FROM tbl_eventsched e
@@ -317,6 +335,16 @@ WHERE es.staff_id = ?";
 }
 
 
+function countVolunteer($connections){
+  $sql = "SELECT COUNT(*) AS total_volunteer FROM tbl_volunteers";
+  $result = mysqli_query($connections, $sql);
+
+  $row = mysqli_fetch_assoc($result);
+
+  $totalvolunteer = $row['total_volunteer'];
+
+  return $totalvolunteer;
+}
 
 
 

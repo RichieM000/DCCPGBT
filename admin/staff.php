@@ -77,12 +77,14 @@
                 <td class="capitalize" style="text-align: left;"><?php echo $row['age']; ?></td>
                 <td class="capitalize"><?php echo $row['gender']; ?></td>
                 <td class="capitalize"><?php echo $row['job_position']; ?></td>
+
                 <td class="text-2xl">
                 
                 <a href="" class="text-blue-500 edit_data"><i class="ri-edit-fill"></i></a>
                 <a href="code.php?idstaff=<?php echo $row['id'];?>" class="text-red-500 hover:text-red-700 delete_data" onclick="return confirm('Are you sure you want to delete this data?')"><i class="ri-delete-bin-fill"></i></a>
                 </td>
             </tr>
+            
             <?php
         }
         ?>

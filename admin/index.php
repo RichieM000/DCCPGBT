@@ -14,53 +14,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if (empty($_POST["password"])) {
         $passwordErr = "Password is required!";
-		
     } else {
         $password = $_POST["password"];
     }
     
     if ($email && $password) {
-        include("connections.php");
-        $check_email = mysqli_query($connections, "SELECT * FROM tbl_staff WHERE email='$email'");
-        $check_email_row = mysqli_num_rows($check_email);
+        $stmt = $connections->prepare("SELECT * FROM tbl_staff WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
         
-        if ($check_email_row > 0) {
-            while ($row = mysqli_fetch_assoc($check_email)) {
-
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
                 $id = $row["id"];
                 $db_password = $row["password"];
                 $account_type = $row["usertype"];
-				$first_name = $row["fname"]; 
-
-				$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $first_name = $row["fname"];
+                
+                $stmt = $connections->prepare("SELECT file_img FROM tbl_staff WHERE id = ?");
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $img_result = $stmt->get_result();
+                $img_row = $img_result->fetch_assoc();
+                
+                if (!empty($img_row['file_img'])) {
+                    $user_img = $img_row['file_img'];
+                } else {
+                    $user_img = 'noimage.png'; // default image
+                }
                 
                 if (password_verify($password, $db_password)) {
-
                     session_start();
-
+                    
                     $_SESSION["id"] = $id;
-					$_SESSION["name"] = $first_name;
+                    $_SESSION["name"] = $first_name;
+                    $_SESSION["file_img"] = $user_img; // consider storing the full URL or path
                     
                     if ($account_type == "admin") {
                         echo "<script>window.location.href='dashboard.php';</script>";
-                       
-                    } else if($account_type == "user") {
-						// echo "<script>window.location.href='../guest/home.php';</script>";
-						$useralert = "This Account is belong to the staff, please go to the <a href='../guest/index.php' style='text-decoration:underline;'>staff login</a>";
-					}else{
-						echo 'There is an error';
-					}
+                    } else if ($account_type == "user") {
+                        // echo "<script>window.location.href='../guest/home.php';</script>";
+                        $useralert = "This Account is belong to the staff, please go to the <a href='../guest/index.php' style='text-decoration:underline;'>staff login</a>";
+                    } else {
+                        echo 'There is an error';
+                    }
                 } else {
                     $passwordErr = "Password is incorrect!";
-					
                 }
             }
         } else {
             $emailErr = "Email is not registered!";
-
-			
         }
-		
     }
 }
 	?>

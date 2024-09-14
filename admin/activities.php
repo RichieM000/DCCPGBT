@@ -7,9 +7,43 @@
 <?php
     include 'functions.php';
     $staffs = getStaffs($connections);
-    $events = getEvent($connections);
+    
     $tools = getTools($connections);
-  
+    $userTasks = getUserRequest($connections);
+    $events = getEvent($connections);
+
+   $currentDate = new DateTime(); // Current date
+
+// Iterate through each event
+foreach ($events as $event) {
+    // Convert the event end date to a DateTime object
+    $endDate = new DateTime($event['end_date']); 
+    
+    // Check if the current date is greater or less than the end date
+    $isExpired = $currentDate > $endDate;
+    $notExpired = $currentDate < $endDate;
+
+    // Update the status in the database based on expiration
+    if ($isExpired && $event['status'] !== 'missed the deadline') {
+        $requestStatus = 'missed the deadline';
+        $sql = "UPDATE tbl_eventsched SET status = ? WHERE id = ?";
+        $stmt = $connections->prepare($sql);
+        $stmt->bind_param("si", $requestStatus, $event['id']);
+        $stmt->execute();
+        $stmt->close();
+    }elseif ($notExpired && $event['status'] === 'missed the deadline') {
+        // Update the status back to its original text
+        $originalStatus = 'in progress'; // assume you have this value stored somewhere
+        $sql = "UPDATE tbl_eventsched SET status = ? WHERE id = ?";
+        $stmt = $connections->prepare($sql);
+        $stmt->bind_param("si", $originalStatus, $event['id']);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+// Check and update status for each task
+
    
 ?>
  
@@ -55,6 +89,7 @@
             <th class="font-bold">Tools & Quantity</th>
             
             <th class="font-bold">Assigned Staff</th>
+            <th class="font-bold">From</th>
             <th class="font-bold">Status</th>
             <th class="font-bold">Start Date</th>
             <th class="font-bold">End Date</th>
@@ -64,8 +99,13 @@
     </thead>
     <tbody>
       
-    <?php foreach($events as $event){
-        
+    <?php foreach($events as $event) 
+    
+    {
+               // Recalculate the end date and status for display purposes
+    $endDate = new DateTime($event['end_date']);
+    $isExpired = $currentDate > $endDate;
+    $eventStatus = $isExpired ? 'missed the deadline' : $event['status'];
           
         ?>
             <tr>
@@ -74,10 +114,38 @@
                 <td class="capitalize"><?php echo $event['location'] ?></td>
 
                 
-                <td class="capitalize"><?php echo $event['tools'] ?></td>
+                <td class="capitalize whitespace-wrap"><?php echo $event['tools'] ?></td>
                 
                 <td class="capitalize"><?php echo $event['staff']?></td>
-                <td class="capitalize"><?php echo $event['status']?></td>
+
+            <?php if($event['request_id'] == '0'){
+                echo '<td class="capitalize">N/A</td>';
+            }else{
+                echo '<td class="capitalize">Resident Request</td>';
+            } 
+            
+            ?>
+
+
+                <td class="capitalize" style="color: <?php 
+    switch ($eventStatus) {
+        case 'missed the deadline':
+            echo 'red';
+            break;
+        case 'in progress':
+            echo 'blue';
+            break;
+            case 'complete':
+                echo 'green';
+                break;
+                case 'done':
+                    echo 'red';
+                    break;    
+        default:
+            echo '';
+            break;
+    }
+?>"><?php echo $eventStatus?></td>
                 
                 <td class="capitalize"><?php echo $event['start_date'] ?></td>
                 <td class="capitalize"><?php echo $event['end_date'] ?></td>
@@ -85,9 +153,21 @@
                 
 
                 <td class="text-2xl">
+                    <div class="flex gap-2">
+                    <?php if($event['status'] == 'in progress' && $event['request_id'] == '0'){ ?>
+                        <form action="code.php" method="POST" id="myForm">
+            <input type="hidden" name="action" value="complete">
+         
+            <input type="hidden" name="id" value="<?php echo $event['id']; ?>">
+        
+                <button type="submit" name="completecleanup" class="text-blue-500 hover:text-blue-700" onclick="return confirm('Mark as Complete?')"><i class="ri-checkbox-circle-fill"></i></button>
+                 </form>
+
+                  <?php } ?>      
                 <a href="#" class="text-blue-500 edit1" ><i class="ri-edit-fill"></i></a>
                 <a href="code.php?idevent=<?php echo $event['id'];?>" class="text-red-500 hover:text-red-700 delete_data" onclick="return confirm('Are you sure you want to delete this data?')"><i class="ri-delete-bin-fill"></i></a>
-                </td>
+                </div>
+            </td>
                
             </tr>
           <?php }?>
@@ -164,7 +244,7 @@ function closeAdminModal() {
       </div>
       <div class="modal-body">
 
-      <form action="code.php" method="POST">
+      <form action="code.php" id="updateactivity" method="POST">
 
       <input type="hidden" name="id" id="event_id" value="">
       
@@ -175,6 +255,7 @@ function closeAdminModal() {
 					<div class="mb-4">
                         <label for="location" class="block font-medium">Location</label>
                         <input type="text" name="location" id="location" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                       
                     </div>
 
                     <div class="tools-container mb-4">
@@ -330,6 +411,9 @@ function closeAdminModal() {
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
 
 <?php include"footer.php" ?>
+
+
+
 
 
 <script>

@@ -46,7 +46,7 @@ $cleaned = cleanedPurok($connections);
 	<div class="grid grid-cols-4 gap-4 mb-4">
 
 	<?php foreach($completes as $complete){ ?>
-		<div class="bg-white shadow-lg pt-4 px-4 mt-4 rounded-md">
+		<div class="bg-white shadow-md pt-4 px-4 rounded-md">
 
 		<div>
 			<h1 class="font-semibold"><span class="font-bold">Title:</span> <?php echo $complete['title'] ?></h1>
@@ -54,11 +54,11 @@ $cleaned = cleanedPurok($connections);
 			<p class="font-semibold"><span class="font-bold">Status:</span> <?php echo $complete['status'] ?></p>
 			<p class="font-semibold"><span class="font-bold">Date Completed:</span> <?php echo $complete['date'] ?></p>
 		</div>
-		<div class="my-4 flex justify-between">
-		<!-- <button class="bg-red-500 p-2 text-white font-semibold rounded-md">Cancel</button> -->
+		<!-- <div class="my-4 flex justify-between">
+		<button class="bg-red-500 p-2 text-white font-semibold rounded-md">Cancel</button>
 			<a href="" data-complete-id="<?php echo $complete['id']; ?>" class="bg-blue-500 p-2 text-white font-semibold rounded-md edit_complete">Add To the record</a>
 			
-		</div>
+		</div> -->
 
 		</div>
 		<?php } ?>
@@ -69,8 +69,7 @@ $cleaned = cleanedPurok($connections);
     <table id="example" class="table table-striped hover font-semibold text-lg">
         <thead>
             <tr>
-                
-                <th class="font-bold">Title</th>
+            
 				<th class="font-bold">Purok</th>
                 <th class="font-bold">Date</th>
                 <th class="font-bold">Paper</th>
@@ -78,7 +77,7 @@ $cleaned = cleanedPurok($connections);
 				<th class="font-bold">Organic</th>
                 <th class="font-bold">Plastic</th>
 				<th class="font-bold">Total Waste</th>
-                <th class="font-bold">Actions</th>
+                <!-- <th class="font-bold">Actions</th> -->
                 
                
             </tr>
@@ -86,8 +85,6 @@ $cleaned = cleanedPurok($connections);
 			<tbody>
 			<?php foreach($cleaned as $clean){ ?>
 			<tr>
-                
-            <td class="capitalize"><?php echo $clean['title'] ?></td>
 				<td class="capitalize"><?php echo $clean['purok'] ?></td>
 				<td><?php echo date('Y-m-d', strtotime($clean['date'])); ?></td>
 				<td><?php echo $clean['paper'] ?></td>
@@ -95,11 +92,11 @@ $cleaned = cleanedPurok($connections);
 				<td><?php echo $clean['organic'] ?></td>
 				<td><?php echo $clean['plastic'] ?></td>
 				<td><?php echo $clean['totalwaste'] ?></td>
-
+<!-- 
 				<td class="text-2xl">
                 <a href="#" data-clean-id="<?php echo $clean['id']; ?>" class="text-blue-500 edit_clean"><i class="ri-edit-fill"></i></a>
                 <a href="code.php?idclean=<?php echo $clean['id'];?>" class="text-red-500 hover:text-red-700" onclick="return confirm('Are you sure you want to delete this data?')"><i class="ri-delete-bin-fill"></i></a>
-                </td>
+                </td> -->
 				
 			</tr>
             <?php } ?>
@@ -126,11 +123,6 @@ $cleaned = cleanedPurok($connections);
 
       <input type="hidden" name="id" id="complete_id">
 	  <input type="hidden" name="action" value="done">
-
-      <div class="mb-4">
-                        <label for="title" class="block font-medium">Title</label>
-                        <input type="text" name="title" id="title" value="" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
-                    </div>
 	
 					<div class="mb-4">
                         <label for="purok" class="block font-medium">Purok</label>
@@ -195,12 +187,6 @@ $cleaned = cleanedPurok($connections);
 
       <input type="hidden" name="id" id="clean_id">
 	  <input type="hidden" name="action" value="done">
-
-
-            <div class="mb-4">
-                        <label for="title1" class="block font-medium">Title</label>
-                        <input type="text" name="title1" id="title1" value="" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
-                    </div>
 	
 					<div class="mb-4">
                         <label for="purok" class="block font-medium">Purok</label>
@@ -303,7 +289,7 @@ $cleaned = cleanedPurok($connections);
 
                     $.each(response, function(Key, value){
                         $('#complete_id').val(value['request_id']);
-                        $('#title').val(value['title']);
+                      
                         $('#purok').val(value['location']);
                         
 
@@ -348,7 +334,7 @@ $cleaned = cleanedPurok($connections);
 
                     $.each(response, function(Key, value){
                         $('#clean_id').val(value['id']);
-                        $('#title1').val(value['title']);
+                      
                         $('#purok1').val(value['purok']);
                         $('#paper1').val(value['paper']);
                         $('#glass1').val(value['glass']);

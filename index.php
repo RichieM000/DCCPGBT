@@ -1,5 +1,19 @@
 
-<?php session_start() ?>
+
+<?php 
+
+session_start(); 
+
+
+
+?>
+<?php
+require_once 'admin/functions.php';
+
+$puroklist = getPurok($connections);
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -111,6 +125,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script> -->
 
+
+
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -121,22 +137,40 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="modal-body">
 
       <form id="profileForm" method="POST" action="admin/code.php" class="grid grid-cols-2 gap-4">
+
+      <input type="hidden" name="request" value="true">
          
             <div class="mb-3">
                         <label for="firstname" class="block font-bold">Firstname</label>
                         <input type="text" name="firstname" id="firstname" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <div id="firstname-error" class="text-danger text-sm" style="display: none;"></div>
                     </div>
+
 					<div class="mb-3">
                         <label for="lastname" class="block font-bold">Lastname</label>
                         <input type="text" name="lastname" id="lastname" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <div id="lastname-error" class="text-danger text-sm" style="display: none;"></div>
                     </div>
-					<div class="mb-3">
+
+					<!-- <div class="mb-3">
                         <label for="address" class="block font-bold">Address/Purok</label>
                         <input type="text" name="address" id="address" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                    </div> -->
+
+          <div class="mb-4">
+                        <label for="address" class="block font-bold">Purok</label>
+                        <select name="address" id="address" class="mt-1 p-2 text-black text-xl border border-gray-300 rounded-md w-full capitalize" required>
+							<?php foreach($puroklist as $purok){ ?>
+                            <option value="<?php echo $purok['purok'] ?>"><?php echo $purok['purok'] ?></option>
+                            
+							<?php } ?>
+                        </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="phone" class="block font-bold">Contact #</label>
                         <input type="text" name="phone" id="phone" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" maxlength="11" required>
+                        <div id="phone-error" class="text-danger text-sm" style="display: none;"></div>
                     </div>
 					<div class="mb-3">
                         <label for="email" class="block font-bold">Email</label>
@@ -152,19 +186,22 @@ document.addEventListener('DOMContentLoaded', function() {
 					</div>
                     <div class="mb-3">
                         <label for="reason" class="block font-bold">Reason For Request</label>
-                        <textarea name="reason" id="reason" rows="3" class="form-textarea block w-full mt-1 p-2 border border-gray-300 rounded-md" required oninput="updateCharacterCount('reason', 500)"></textarea>
-                        <p class="text-sm text-gray-600"><span id="reasonCount">0</span>/500 characters</p>
+                        <textarea name="reason" id="reason" rows="3" class="form-textarea block w-full mt-1 p-2 border border-gray-300 rounded-md" required oninput="updateCharacterCount('reason', 200)"></textarea>
+                        <p class="text-sm text-gray-600"><span id="reasonCount">0</span>/200 characters</p>
                     </div>
                     <div class="mb-3">
                         <label for="comments" class="block font-bold">Additional Notes/Comments:</label>
-                        <textarea name="comments" id="comments" rows="3" class="form-textarea block w-full mt-1 p-2 border border-gray-300 rounded-md" oninput="updateCharacterCount('comments', 200)"></textarea>
-                        <p class="text-sm text-gray-600"><span id="commentsCount">0</span>/200 characters</p>
+                        <textarea name="comments" id="comments" rows="3" class="form-textarea block w-full mt-1 p-2 border border-gray-300 rounded-md" oninput="updateCharacterCount('comments', 150)"></textarea>
+                        <p class="text-sm text-gray-600"><span id="commentsCount">0</span>/150 characters</p>
                     </div>
 
                     <div class="col-span-2 m-auto">
         <button type="button" class="" data-bs-dismiss="modal">Close</button>
         <button type="submit" name="submitrequest" class="bg-blue-500 text-white p-2 rounded-md">Submit</button>
       </div>
+
+
+      
                     
         </form>
        
@@ -175,6 +212,118 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 </div>
+
+<!-- <script>
+  const firstnameInput = document.getElementById('firstname');
+  const lastnameInput = document.getElementById('lastname');
+  const contactInput = document.getElementById('phone'); // assuming you have an input field for contact
+
+  const validateForm = () => {
+    let isValid = true;
+
+    // Validate Firstname
+    const firstnameValue = firstnameInput.value.trim();
+    if (!/^[a-zA-Z]+$/.test(firstnameValue)) {
+      document.getElementById('firstname-error').innerHTML = 'Firstname should only contain letters.';
+      document.getElementById('firstname-error').style.display = 'block';
+      isValid = false;
+    } else {
+      document.getElementById('firstname-error').style.display = 'none';
+    }
+
+    // Validate Lastname
+    const lastnameValue = lastnameInput.value.trim();
+    if (!/^[a-zA-Z]+$/.test(lastnameValue)) {
+      document.getElementById('lastname-error').innerHTML = 'Lastname should only contain letters.';
+      document.getElementById('lastname-error').style.display = 'block';
+      isValid = false;
+    } else {
+      document.getElementById('lastname-error').style.display = 'none';
+    }
+
+    // Validate Contact (Philippines mobile number only)
+    const contactValue = contactInput.value.trim();
+    if (!/^09\d{9}$/.test(contactValue)) {
+      // 09 is the prefix for Philippines mobile numbers, followed by 9 digits
+      document.getElementById('phone-error').innerHTML = 'Invalid PH mobile number.';
+      document.getElementById('phone-error').style.display = 'block';
+      isValid = false;
+    } else {
+      document.getElementById('phone-error').style.display = 'none';
+    }
+
+    return isValid;
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('profileForm'); // assuming you have a form element
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      form.submit(); // submit the form if validation is successful
+    }
+  });
+});
+</script> -->
+
+<script>
+$(document).ready(function() {
+    $('#profileForm').submit(function(event) {
+        event.preventDefault();
+        var formData = $(this).serialize();
+        
+        $.ajax({
+            type: 'POST',
+            url: 'admin/code.php',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                console.log(response); // Log the raw response for debugging
+                
+                // Clear previous error messages
+                $('#firstname-error').text('');
+                $('#lastname-error').text('');
+                $('#phone-error').text('');
+
+                if (response.status == 'success') {
+                    $('#staticBackdrop').modal('hide');
+                    swal({
+                            title: response.message,
+                            text: "The barangay staff's will send a notif through text or email if your request has been approved.",
+                            icon: 'success',
+                            button: 'Okay'
+                        }).then(function() {
+                                location.reload(); // add this line to reload the window
+                            });
+                } else {
+                    // Handle error response
+                    if (response.firstname) {
+                        $('#firstname-error').text(response.firstname).show();
+                    }
+                    if (response.lastname) {
+                        $('#lastname-error').text(response.lastname).show();
+                    }
+                    if (response.phone) {
+                        $('#phone-error').text(response.phone).show();
+                    }
+                    // Show the modal if there are errors
+                    $('#staticBackdrop').modal('show');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Error: " + textStatus, errorThrown);
+            }
+        });
+    });
+});
+
+
+</script>
+
+
+
+
+
 <script>
         function updateCharacterCount(id, maxLength) {
             const textArea = document.getElementById(id);
@@ -200,6 +349,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	<script src="admin/assets/js/jquery.validate.min.js"></script>
 	<script src="admin/assets/js/neon-login.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    
 
 <?php
 if(isset($_SESSION['status']) && $_SESSION['status'] != ''){

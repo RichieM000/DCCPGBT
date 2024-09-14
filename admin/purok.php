@@ -72,7 +72,7 @@ $puroklist = getPurok($connections);
       <td class="capitalize"><?php echo $purok['population'] ?></td>
 			<td class="text-2xl">
                 <a href="#" data-purok-id="<?php echo $purok['id']; ?>" class="text-blue-500 edit_purok"><i class="ri-edit-fill"></i></a>
-                <a href="code.php?idtool=<?php echo $purok['id'];?>" class="text-red-500 hover:text-red-700" onclick="return confirm('Are you sure you want to delete this data?')"><i class="ri-delete-bin-fill"></i></a>
+                <a href="code.php?idpurok=<?php echo $purok['id'];?>" class="text-red-500 hover:text-red-700" onclick="return confirm('Are you sure you want to delete this data?')"><i class="ri-delete-bin-fill"></i></a>
                 </td>
 		 </tr>
 		 <?php }?>

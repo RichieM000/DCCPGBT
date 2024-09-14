@@ -1,8 +1,19 @@
 
-<?php session_start() ?>
+<?php include "code.php"; ?>
+<?php
+if (isset($_SESSION['errors'])) {
+    $errors = $_SESSION['errors'];
+    $input_values = $_SESSION['oldvalue'];
+    unset($_SESSION['errors']); // unset the session variable
+    unset($_SESSION['oldvalue']);
+} else {
+    $errors = array();
+    $input_values = array();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
-<?php include"header.php"?>
+<?php include "header.php"?>
 
 
 
@@ -41,26 +52,31 @@
 		<form action="code.php" method="POST" class="grid grid-cols-2 gap-4 m-3 text-white" enctype="multipart/form-data">
 			
 			<div class="">
-
+            <input type="hidden" name="addstaff" value="true">
+            
 				<div class="mb-4">
                         <label for="fname" class="block font-medium">Firstname</label>
-                        <input type="text" name="fname" id="fname" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <input type="text" name="fname" id="fname" value="<?php echo isset($input_values['fname']) ? $input_values['fname'] : ''; ?>" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <?php if(isset($errors['fname'])) { echo "<span class='text-red-400'>".$errors['fname']."</span>"; }?>
                     </div>
 					<div class="mb-4">
                         <label for="lname" class="block font-medium">Lastname</label>
-                        <input type="text" name="lname" id="lname" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <input type="text" name="lname" id="lname" value="<?php echo isset($input_values['lname']) ? $input_values['lname'] : ''; ?>" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <?php if(isset($errors['lname'])) { echo "<span class='text-red-400'>".$errors['lname']."</span>"; }?>
                     </div>
 					<div class="mb-4">
                         <label for="address" class="block font-medium">Address</label>
-                        <input type="text" name="address" id="address" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <input type="text" name="address" id="address" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" value="<?php echo isset($input_values['address']) ? $input_values['address'] : ''; ?>" required>
                     </div>
                     <div class="mb-4">
                         <label for="phone" class="block font-medium">Contact #</label>
-                        <input type="text" name="phone" id="phone" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" maxlength="11" required>
+                        <input type="text" name="phone" id="phone" value="<?php echo isset($input_values['phone']) ? $input_values['phone'] : ''; ?>" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" maxlength="11" required>
+                        <?php if(isset($errors['phone'])) { echo "<span class='text-red-400'>".$errors['phone']."</span>"; }?>
                     </div>
 					<div class="mb-4">
                         <label for="age" class="block font-medium">Age</label>
-                        <input type="text" name="age" id="age" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <input type="text" name="age" id="age" value="<?php echo isset($input_values['age']) ? $input_values['age'] : ''; ?>" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <?php if(isset($errors['age'])) { echo "<span class='text-red-400'>".$errors['age']."</span>"; }?>
                     </div>
 					<div class="mb-4">
                         <label for="gender" class="block font-medium">Gender</label>
@@ -80,11 +96,12 @@
                             <option value="Kagawad">Kagawad</option>
                             <option value="Tanod">Tanod</option>
                             <option value="SKchairman">SK Chairman</option>
-                            <option value="SK">SK</option>
+                            <!-- <option value="SK">SK</option>
                             <option value="Clerk">Clerk</option>
-                            <option value="BHW">Barangay Health Workers</option>
+                            <option value="BHW">Barangay Health Workers</option> -->
                         </select>
                     </div>
+             
 
 				</div>
 			<div class="">
@@ -110,7 +127,7 @@ function loadFile(event) {
 
 						<div class="mb-4">
                         <label for="email" class="block font-medium">Email</label>
-                        <input type="text" name="email" id="email" class="mt-1 p-2 text-black text-xl border border-gray-300 rounded-md w-full" required>
+                        <input type="text" name="email" id="email" class="mt-1 p-2 text-black text-xl border border-gray-300 rounded-md w-full" value="<?php echo isset($input_values['email']) ? $input_values['email'] : ''; ?>" required>
                     </div>
 					<div class="mb-4">
                         <label for="password" class="block font-medium">Password</label>
@@ -119,7 +136,7 @@ function loadFile(event) {
 					<div class="mb-4">
                         <label for="cpassword" class="block font-medium">Confirm Password</label>
                         <input type="password" name="cpassword" id="cpassword" class="mt-1 p-2 text-black text-xl border border-gray-300 rounded-md w-full" required>
-                       
+                        <?php if(isset($errors['cpassword'])) { echo "<span class='text-red-400'>".$errors['cpassword']."</span>"; }?>
                     </div>
 
 </div>

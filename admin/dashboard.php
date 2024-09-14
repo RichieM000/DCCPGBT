@@ -12,6 +12,7 @@ require_once 'functions.php';
 	$totalevent = countEvent($connections);
 	$totalcleaned = countCleaned($connections);
 	$totalAlbum = countAlbum($connections);
+	$totalvolunteer = countVolunteer($connections);
 
 
 	
@@ -84,84 +85,7 @@ require_once 'functions.php';
 		
 		<hr />
 		
-		<script type="text/javascript">
-		jQuery(document).ready(function($)
-		{
-			$('.pie').sparkline('html', {
-				type: 'pie',
-				borderWidth: 0,
-				sliceColors: ['#3d4554', '#ee4749','#00b19d']
-			});
-		
-		
-			$(".chart").sparkline([1,2,3,1], {
-				type: 'pie',
-				barColor: '#485671',
-				height: '110px',
-				barWidth: 10,
-				barSpacing: 2});
-		
-		
-			var seriesData = [ [], [] ];
-		
-			var random = new Rickshaw.Fixtures.RandomData(50);
-		
-			for (var i = 0; i < 90; i++)
-			{
-				random.addData(seriesData);
-			}
-		
-			var graph = new Rickshaw.Graph( {
-				element: document.getElementById("rickshaw-chart-demo-2"),
-				height: 217,
-				renderer: 'area',
-				stroke: false,
-				preserve: true,
-				series: [{
-						color: '#359ade',
-						data: seriesData[0],
-						name: 'Page Views'
-					}, {
-						color: '#73c8ff',
-						data: seriesData[1],
-						name: 'Unique Users'
-					}, {
-						color: '#e0f2ff',
-						data: seriesData[1],
-						name: 'Bounce Rate'
-					}
-				]
-			} );
-		
-			graph.render();
-		
-			var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-				graph: graph,
-				xFormatter: function(x) {
-					return new Date(x * 1000).toString();
-				}
-			} );
-		
-			var legend = new Rickshaw.Graph.Legend( {
-				graph: graph,
-				element: document.getElementById('rickshaw-legend')
-			} );
-		
-			var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight( {
-				graph: graph,
-				legend: legend
-			} );
-		
-			setInterval( function() {
-				random.removeData(seriesData);
-				random.addData(seriesData);
-				graph.update();
-		
-			}, 500 );
-		
-		});
-		</script>
-		
+	
 		
 		<div class="row">
 			<div class="col-sm-12">
@@ -217,7 +141,7 @@ require_once 'functions.php';
 		
 		</div>
 
-<div class="bg-orange-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+<div class="bg-orange-500 shadown-md rounded-md text-white pt-4 px-4 m-2 <?= ($totalrequest > 0) ? 'relative' : ''; ?>">
 
 		<div class="flex justify-between items-center">
 
@@ -233,6 +157,13 @@ require_once 'functions.php';
 		<div class="flex items-end justify-center mt-3">
 		<a href="request.php" class="text-white font-bold hover:underline">More info →</a>
 		</div>
+
+		<?php if ($totalrequest > 0) { ?>
+        <span class="absolute top-0 right-0 h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span class="absolute top-0 right-0 inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+        </span>
+    <?php } ?>
 
 </div>
 
@@ -274,7 +205,7 @@ require_once 'functions.php';
 
 </div>
 
-<div class="bg-yellow-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+<div class="bg-yellow-500 shadown-md rounded-md text-white pt-4 px-4 m-2 <?= ($totalevent > 0) ? 'relative' : ''; ?>">
 
 		<div class="flex justify-between items-center">
 
@@ -291,9 +222,16 @@ require_once 'functions.php';
 		<a href="activities.php" class="text-white font-bold hover:underline">More info →</a>
 		</div>
 
+		<?php if ($totalevent > 0) { ?>
+        <span class="absolute top-0 right-0 h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span class="absolute top-0 right-0 inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+        </span>
+    <?php } ?>
+
 </div>
 
-<div class="bg-emerald-500 shadown-md rounded-md text-white pt-4 px-4 m-2">
+<div class="bg-emerald-500 shadown-md rounded-md text-white pt-4 px-4 m-2 <?= ($totalcleaned > 0) ? 'relative' : ''; ?>">
 
 		<div class="flex justify-between items-center">
 
@@ -309,6 +247,13 @@ require_once 'functions.php';
 		<div class="flex items-end justify-center mt-3">
 		<a href="cleaned.php" class="text-white font-bold hover:underline">More info →</a>
 		</div>
+
+		<?php if ($totalcleaned > 0) { ?>
+        <span class="absolute top-0 right-0 h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span class="absolute top-0 right-0 inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+        </span>
+    <?php } ?>
 
 </div>
 
@@ -327,6 +272,25 @@ require_once 'functions.php';
 
 		<div class="flex items-end justify-center mt-3">
 		<a href="doc.php" class="text-white font-bold hover:underline">More info →</a>
+		</div>
+
+</div>
+
+<div class="bg-red-400 shadown-md rounded-md text-white pt-4 px-4 m-2">
+
+		<div class="flex justify-between items-center">
+
+		<div class="flex flex-col">
+			<h2 class="text-4xl font-bold"><?php echo $totalvolunteer ?></h2>
+			<h1 class="mt-1.5 text-base">Volunteers</h1>
+		</div>
+
+		<span class="text-6xl opacity-25 text-black"><i class="ri-team-fill"></i></span>
+
+		</div>
+
+		<div class="flex items-end justify-center mt-3">
+		<a href="list.php" class="text-white font-bold hover:underline">More info →</a>
 		</div>
 
 </div>

@@ -65,11 +65,11 @@ $volunteers = getVolunteer($connections);
           <tr>
 			
                 <td class="list_id" style="display: none;"><?php echo $volunteer['id'] ?></td>
-				<td><?php echo $volunteer['firstname']; ?></td>
-				<td><?php echo $volunteer['lastname']; ?></td>
+				<td class="capitalize"><?php echo $volunteer['firstname']; ?></td>
+				<td class="capitalize"><?php echo $volunteer['lastname']; ?></td>
 				<td><?php echo $volunteer['gender']; ?></td>
 				<td><?php echo $volunteer['contact']; ?></td>
-				<td><?php echo $volunteer['address']; ?></td>
+				<td class="capitalize"><?php echo $volunteer['address']; ?></td>
 				<td><?php echo $volunteer['title']; ?></td>
        
               
@@ -99,17 +99,19 @@ $volunteers = getVolunteer($connections);
       </div>
       <div class="modal-body">
 
-      <form action="code.php" method="POST" enctype="multipart/form-data">
+      <form action="code.php" method="POST" id="addvolunteerform" enctype="multipart/form-data">
 
       
 	
 					<div class="mb-4">
                         <label for="firstname" class="block font-medium">Firstname</label>
                         <input type="text" name="firstname" id="firstname" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <div id="firstname-error" class="text-danger text-sm" style="display: none;"></div>
                     </div>
 					<div class="mb-4">
                         <label for="lastname" class="block font-medium">Lastname</label>
                         <input type="text" name="lastname" id="lastname" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <div id="lastname-error" class="text-danger text-sm" style="display: none;"></div>
                     </div>
 					<div class="mb-4">
                         <label for="gender" class="block font-medium">Gender</label>
@@ -122,6 +124,7 @@ $volunteers = getVolunteer($connections);
 					<div class="mb-4">
                         <label for="contact" class="block font-medium">Contact #</label>
                         <input type="text" name="contact" id="contact" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" maxlength="11" required>
+                        <div id="phone-error" class="text-danger text-sm" style="display: none;"></div>
                     </div>
 					<div class="mb-4">
                         <label for="address" class="block font-medium">Address</label>
@@ -165,17 +168,19 @@ $volunteers = getVolunteer($connections);
       </div>
       <div class="modal-body">
 
-      <form action="code.php" id="edit-form" method="POST" enctype="multipart/form-data">
+      <form action="code.php" id="editvolunteerform" method="POST" enctype="multipart/form-data">
 
       <input type="hidden" name="id" id="list_id">
 
       <div class="mb-4">
                         <label for="firstname" class="block font-medium">Firstname</label>
                         <input type="text" name="firstname" id="firstname1" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <div id="firstname-error1" class="text-danger text-sm" style="display: none;"></div>
                     </div>
 					<div class="mb-4">
                         <label for="lastname" class="block font-medium">Lastname</label>
                         <input type="text" name="lastname" id="lastname1" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" required>
+                        <div id="lastname-error1" class="text-danger text-sm" style="display: none;"></div>
                     </div>
 					<div class="mb-4">
                         <label for="gender" class="block font-medium">Gender</label>
@@ -188,6 +193,7 @@ $volunteers = getVolunteer($connections);
 					<div class="mb-4">
                         <label for="contact" class="block font-medium">Contact #</label>
                         <input type="text" name="contact" id="contact1" class="mt-1 p-2 text-black text-xl capitalize border border-gray-300 rounded-md w-full" maxlength="11" required>
+                        <div id="phone-error1" class="text-danger text-sm" style="display: none;"></div>
                     </div>
 					<div class="mb-4">
                         <label for="address" class="block font-medium">Address</label>
@@ -215,6 +221,112 @@ $volunteers = getVolunteer($connections);
     </div>
   </div>
 </div>
+
+
+<script>
+$(document).ready(function() {
+    $('#editvolunteerform').submit(function(event) {
+        event.preventDefault();
+        var formData = $(this).serialize();
+        
+        $.ajax({
+            type: 'POST',
+            url: 'code.php',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                console.log(response); // Log the raw response for debugging
+                
+                // Clear previous error messages
+                $('#firstname-error1').text('');
+                $('#lastname-error1').text('');
+                $('#phone-error1').text('');
+
+                if (response.status == 'success') {
+                    $('#editlist').modal('hide');
+                    swal({
+                            title: response.message,
+                            text: "Updated Successfully",
+                            icon: 'success',
+                            button: 'Okay'
+                        }).then(function() {
+                                location.reload(); // add this line to reload the window
+                            });
+                } else {
+                    // Handle error response
+                    if (response.firstname) {
+                        $('#firstname-error1').text(response.firstname).show();
+                    }
+                    if (response.lastname) {
+                        $('#lastname-error1').text(response.lastname).show();
+                    }
+                    if (response.contact) {
+                        $('#phone-error1').text(response.contact).show();
+                    }
+                    // Show the modal if there are errors
+                    $('#editlist').modal('show');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Error: " + textStatus, errorThrown);
+            }
+        });
+    });
+});
+
+</script>
+
+<script>
+$(document).ready(function() {
+    $('#addvolunteerform').submit(function(event) {
+        event.preventDefault();
+        var formData = $(this).serialize();
+        
+        $.ajax({
+            type: 'POST',
+            url: 'code.php',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                console.log(response); // Log the raw response for debugging
+                
+                // Clear previous error messages
+                $('#firstname-error').text('');
+                $('#lastname-error').text('');
+                $('#phone-error').text('');
+
+                if (response.status == 'success') {
+                    $('#addvolunteer').modal('hide');
+                    swal({
+                            title: response.message,
+                            text: "Added Successfully",
+                            icon: 'success',
+                            button: 'Cool'
+                        }).then(function() {
+                                location.reload(); // add this line to reload the window
+                            });
+                } else {
+                    // Handle error response
+                    if (response.firstname) {
+                        $('#firstname-error').text(response.firstname).show();
+                    }
+                    if (response.lastname) {
+                        $('#lastname-error').text(response.lastname).show();
+                    }
+                    if (response.contact) {
+                        $('#phone-error').text(response.contact).show();
+                    }
+                    // Show the modal if there are errors
+                    $('#addvolunteer').modal('show');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Error: " + textStatus, errorThrown);
+            }
+        });
+    });
+});
+</script>
 
 <script>
   $(document).ready(function (){

@@ -189,21 +189,60 @@ document.getElementById('img').addEventListener('change', function(event) {
     <div class="mt-8 mb-28">
         <h1 class="font-bold text-lg text-center">IMAGES</h1>
 
-        <div class="p-28 m-4 shadow-lg rounded-lg">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+        <div class="p-28 m-4 shadow-lg rounded-lg container mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
         <?php foreach($images as $image){ ?>
             <div class="flex flex-col items-center">
-        <img src="<?php echo $image['image_src']; ?>" alt="Album Cover" class="w-48 h-48 shadow-xl cursor-pointer rounded-lg hover:scale-110 transition duration-300 ease-in-out">
-        <div class="text-2xl mt-3">
-            <a href="" class="edit_image text-blue-500" data-image-id="<?php echo $image['album_data']['id']; ?>"><i class="ri-pencil-fill"></i></a>   
-            <a href="code.php?idimage=<?php echo $image['album_data']['id']; ?>&albumid=<?php echo $albumId; ?>" onclick="return confirm('Are you sure you want to delete this image?')" class="text-red-500"><i class="ri-delete-bin-2-fill"></i></a>
-        </div> 
-    </div>
+                <div class="relative w-full h-48"> <img src="<?php echo $image['image_src']; ?>" alt="Image" class="img-preview absolute inset-0 w-full h-full object-cover shadow-xl cursor-pointer rounded-lg hover:scale-110 transition duration-300 ease-in-out"> </div>
+                <div class="text-2xl mt-3">
+                    <a href="" class="edit_image text-blue-500" data-image-id="<?php echo $image['album_data']['id']; ?>"><i class="ri-pencil-fill"></i></a>   
+                    <a href="code.php?idimage=<?php echo $image['album_data']['id']; ?>&albumid=<?php echo $albumId; ?>" onclick="return confirm('Are you sure you want to delete this image?')" class="text-red-500"><i class="ri-delete-bin-2-fill"></i></a>
+                </div> 
+            </div>
         <?php }?>
     </div>
-        </div>
+</div>
 
     </div>
+
+
+    <div class="modal backdrop-opacity-10 backdrop-invert bg-white/30" id="image-modal">
+  <div class="modal-content bg-white rounded shadow-md p-4 max-w-2xl mx-auto">
+    <span class="close text-gray-400 hover:text-gray-900 cursor-pointer text-2xl font-bold transition duration-300 ease-in-out">&times;</span>
+    <img src="" id="modal-image" alt="Image Preview" class="w-full h-auto" />
+  </div>
+</div>
+
+<script>
+  // Get the modal and image elements
+  var modal = document.getElementById("image-modal");
+  var modalImage = document.getElementById("modal-image");
+  var closeButton = document.getElementsByClassName("close")[0];
+
+  // Add event listener to the image
+  document.addEventListener("DOMContentLoaded", function() {
+    var images = document.querySelectorAll(".img-preview");
+    images.forEach(function(image) {
+      image.addEventListener("click", function() {
+        // Get the image source and set it as the modal image source
+        modalImage.src = this.src;
+        modal.style.display = "block";
+      });
+    });
+  });
+
+  // Add event listener to the close button
+  closeButton.addEventListener("click", function() {
+    modal.style.display = "none";
+  });
+
+  // Add event listener to the modal to close when clicked outside
+  window.addEventListener("click", function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  });
+</script>
 
     <script>
    $(document).ready(function (){
